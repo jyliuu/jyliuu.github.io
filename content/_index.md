@@ -15,7 +15,7 @@ imgname:
 #     type: $IMAGE_TYPE
 # ...
 # A title (job title or "Researcher", "PhD student", etc.)
-personal_title: "PhD student"
+personal_title: "3+5 PhD student"
 # An address (you can list multiple)
 address:
   - name: University of Copenhagen
