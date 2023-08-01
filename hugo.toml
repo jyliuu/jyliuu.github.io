@@ -22,6 +22,21 @@ pygmentsStyle = "native"
     post = "/:slug/"
     page = "/:slug/"
 
+[[menu.main]]
+    name = "Posts"
+    url = "/post/"
+    weight = -150
+
+# Make the tags and categories pages accessible directly from the navbar.
+[[menu.main]]
+    name = "Tags"
+    url = "/tags/"
+    weight = -120
+
+[[menu.main]]
+    name = "Categories"
+    url = "/categories/"
+    weight = -130
 
 # Site wide params and SEO
 [params]
