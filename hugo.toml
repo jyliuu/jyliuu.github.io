@@ -1,6 +1,6 @@
 baseURL = 'http://example.org/'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
+title = 'Jinyang Liu'
 theme = "astatine"
 
 preserveTaxonomyNames = true
@@ -22,29 +22,6 @@ pygmentsStyle = "native"
     post = "/:slug/"
     page = "/:slug/"
 
-# Configure main navbar links. They can have a weight to select the order.
-# This links to content within the content/post/ folder
-[[menu.main]]
-    name = "Posts"
-    url = "/post/"
-    weight = -150
-
-# This links to the page about.md
-[[menu.main]]
-    name = "About"
-    url = "/about/"
-    weight = -110
-
-# Make the tags and categories pages accessible directly from the navbar.
-[[menu.main]]
-    name = "Tags"
-    url = "/tags/"
-    weight = -120
-
-[[menu.main]]
-    name = "Categories"
-    url = "/categories/"
-    weight = -130
 
 # Site wide params and SEO
 [params]
@@ -53,7 +30,7 @@ pygmentsStyle = "native"
     description = """The homepage of Astatine. This website is a demo the of the \
     Hugo theme Astatine."""
     # Author of the site
-    authorName = "Jack Harkness"
+    authorName = "Jinyang Liu"
     # Main image for the author. This will be the default image for SEO.
     [params.imgname]
         name = "img/main.jpg"
