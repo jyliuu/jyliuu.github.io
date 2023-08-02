@@ -1,6 +1,6 @@
 baseURL = 'http://example.org/'
 languageCode = 'en-us'
-title = 'Jinyang Liu'
+title = 'Jinyang Liu (刘锦阳)'
 theme = "astatine"
 
 preserveTaxonomyNames = true
@@ -44,7 +44,7 @@ pygmentsStyle = "native"
     # missing it will fallback to that one.
     description = """I am a PhD student studying at the University of Copenhagen."""
     # Author of the site
-    authorName = "Jinyang Liu"
+    authorName = "Jinyang Liu (刘锦阳)"
     # Main image for the author. This will be the default image for SEO.
     [params.imgname]
         name = "img/main.jpg"
