@@ -44,6 +44,7 @@ pygmentsStyle = "native"
     description = """I am a PhD student studying at the University of Copenhagen."""
     # Author of the site
     authorName = "Jinyang Liu (刘锦阳)"
+    googleAnalytics = "G-MPPP48WSKE"
     # Main image for the author. This will be the default image for SEO.
     [params.imgname]
         name = "img/main.jpg"
@@ -62,7 +63,7 @@ pygmentsStyle = "native"
     
     # Enable link to feed in footer
     blogrss = true
-
+    
     # Enable pingback and webmention via webmention.io
     # webmention = "hugocisneros.com"
 
