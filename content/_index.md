@@ -22,6 +22,48 @@ address:
     street: Universitetsparken 5 (Department of Mathematical Sciences)
     postal_code: 2100
     locality: Copenhagen
+
+contact: 
+  - github: "https://github.com/jyliuu"
+    linkedin: "https://www.linkedin.com/in/jinyang-liu"
+    email: jl (at) math.ku.dk
+
+# (which should be the image path). The other fields are optional.
+publications:
+  - 
+    authors:
+        - name: Liu, J. 
+          me: true
+        - name: Steensgaard, T. 
+        - name: Wright, M.
+        - name: Pfister, N.
+        - name: Hiabu, M.
+    title: "Fast Estimation of Partial Dependence Functions using Trees"
+    # Will write "In ${journal}, ${date}"
+    date: 2024
+    journal: arXiv preprint
+    image: img/fastpd.png
+    # A bibtex (or any other format) citation that people can copy directly from the website.
+    citation: "@misc{liu2024fastestimationpartialdependence,\n
+      title={Fast Estimation of Partial Dependence Functions using Trees},\n
+      author={Jinyang Liu and Tessa Steensgaard and Marvin N. Wright and Niklas Pfister and Munir Hiabu},\n
+      year={2024},\n
+      eprint={2410.13448},\n
+      archivePrefix={arXiv},\n
+      primaryClass={cs.LG},\n
+      url={https://arxiv.org/abs/2410.13448},\n
+}"
+    pdf: https://arxiv.org/pdf/2410.13448
+    # A list of link that will appear as badges at the bottom of the publication.
+    links:
+      -
+        name: arXiv
+        url: "https://arxiv.org/abs/2410.13448"
+      - 
+        name: Code
+        url: "https://github.com/jyliuu/fastpd-reproducibility-code"
+    description: We provide a novel and fast method for computing partial dependence funtions for tree-based prediction models such as XGBoost and Random Forests. The implementation has since been integrated in the R-package glex.
+  
 ---
 
 # About
@@ -43,13 +85,3 @@ In addition, I have experience in software engineering and DevOps. I am proficie
   BSc in Mathematics
 - H.C. Ørsted Gymnasiet i Lyngby, Aug 2017 - June 2020  
   Danish technical high school education (HTX)
-
----
-
-## Find me at
-
-- Email: jl (at) math.ku.dk
-- [LinkedIn](https://www.linkedin.com/in/jinyang-liu-9776ab168/)
-- [GitHub](https://github.com/jyliuu)
-
-_This site was made using the [Astatine theme](https://github.com/hugcis/hugo-astatine-theme) for Hugo_

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Software Development on Jinyang Liu (刘锦阳)</title>
+    <link>//localhost:1313/tags/software-development/</link>
+    <description>Recent content in Software Development on Jinyang Liu (刘锦阳)</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 06 Oct 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="//localhost:1313/tags/software-development/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Debugging Rcpp with VSCode</title>
+      <link>//localhost:1313/debugging-rcpp-vscode/</link>
+      <pubDate>Fri, 06 Oct 2023 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/debugging-rcpp-vscode/</guid>
+      <description>&lt;h2 id=&#34;preface&#34;&gt;Preface&lt;/h2&gt;&#xA;&lt;p&gt;The following post details the process of connecting the VSCode debugger with Rcpp, it is a compilation from the following sources:&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://blog.davisvaughan.com/posts/2022-03-11-using-vs-code-to-debug-r-packages-with-c-code/&#34; target=&#34;_blank&#34; &gt;Using VS Code to Debug R Packages with C or C++ Code&lt;/a&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://github.com/renkun-ken/vscode-rcpp-demo/tree/master&#34; target=&#34;_blank&#34; &gt;vscode-rcpp-demo (GitHub repo)&lt;/a&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://r-pkgs.org/dependencies-in-practice.html#sec-dependencies-in-imports&#34; target=&#34;_blank&#34; &gt;R packages documentation&lt;/a&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;I am running on a MacBook Pro with the M2 Pro chip, my R version is 4.3.1 and is installed via Homebrew.&lt;/p&gt;&#xA;&lt;h2 id=&#34;step-0-installing-necessary-r-packages&#34;&gt;Step 0: Installing necessary R packages&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://github.com/ManuelHentschel/vscDebugger&#34; target=&#34;_blank&#34; &gt;vscDebugger&lt;/a&gt;&#xA;: An R language connector that connects to the VSCode debugger, for R code only&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://devtools.r-lib.org/&#34; target=&#34;_blank&#34; &gt;devtools&lt;/a&gt;&#xA;: Necessary for building the R package&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://github.com/r-lib/usethis&#34; target=&#34;_blank&#34; &gt;usethis&lt;/a&gt;&#xA;: For setting up the package skeleton&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://github.com/r-lib/testthat&#34; target=&#34;_blank&#34; &gt;testhat&lt;/a&gt;&#xA;: For creating unit-tests&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h2 id=&#34;step-1-getting-vscode-to-work-with-c&#34;&gt;Step 1: Getting VSCode to work with C++&lt;/h2&gt;&#xA;&lt;p&gt;Install VSCode if you haven&amp;rsquo;t already, and add the following extensions as detailed by Davis Vaughan in the first post above&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

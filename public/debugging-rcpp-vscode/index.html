@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1"><title>Debugging Rcpp with VSCode - Jinyang Liu (刘锦阳)</title>
+<meta property="og:title" content="Debugging Rcpp with VSCode - Jinyang Liu (刘锦阳)">
+<meta property="og:type" content="article">
+
+
+<meta property="og:image" content="img/main.jpg">
+
+<meta property="og:url" content="//localhost:1313/debugging-rcpp-vscode/"><meta property="og:description" content="I am a PhD student studying at the University of Copenhagen.">
+<meta name="Description" property="description" content="I am a PhD student studying at the University of Copenhagen.">
+
+
+<meta property="keywords" content ="rcpp, software development, statistics">
+
+
+
+<link rel="stylesheet" href="//localhost:1313/css/style.min.css">
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link href="//localhost:1313/index.xml" type="application/atom+xml" rel="alternate" title="Sitewide Atom feed" />
+<meta name="theme-color" content="#ffffff">
+
+
+<script>function updateMode(){localStorage.theme==="dark"||!("theme"in localStorage)&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.classList.add("dark"):document.documentElement.classList.remove("dark")}function toggleMode(){localStorage.theme==="dark"?localStorage.theme="light":localStorage.theme="dark",updateMode()}window.onload=updateMode();function toggleMenu(){let e=document.getElementById("navbar-default");e.classList.contains("hidden")?e.classList.remove("hidden"):e.classList.add("hidden")}</script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MPPP48WSKE"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MPPP48WSKE');
+</script>
+
+  </head>
+  <body>
+    <header class="md:px-0 px-2">
+        <nav>
+  <div class="container flex flex-wrap justify-between items-center mx-auto">
+    <div class="nav-main my-2.5">
+      <a
+        href="//localhost:1313/"
+        class="nav-title py-2.5 text-2xl text-zinc-600 dark:text-zinc-300 hover:border-b-0"
+        >Jinyang Liu (刘锦阳)</a
+      >
+    </div>
+    <button
+      type="button"
+      onclick="toggleMenu()"
+      class="inline-flex items-center p-2 ml-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+      aria-controls="navbar-default"
+      aria-expanded="false"
+    >
+      <span class="sr-only">Open main menu</span>
+      <svg
+        class="w-6 h-6"
+        aria-hidden="true"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1
+                           0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0
+                           01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0
+                           01-1-1z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    </button>
+    <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+      <ul
+        class="grid md:grid-flow-col items-center justify-between text-lg my-2.5 grid-cols-1 pl-0 text-center"
+      >
+         
+        <li
+          class="p-2.5 md:first:pl-0 md:border-none border-b dark:border-zinc-500 list-none"
+        >
+          <a
+            class="text-zinc-600 dark:text-zinc-300 hover:border-b-0"
+            href="/post/"
+            >Posts</a
+          >
+        </li>
+        
+        <li
+          class="p-2.5 md:first:pl-0 md:border-none border-b dark:border-zinc-500 list-none"
+        >
+          <a
+            class="text-zinc-600 dark:text-zinc-300 hover:border-b-0"
+            href="/categories/"
+            >Categories</a
+          >
+        </li>
+        
+        <li
+          class="p-2.5 md:first:pl-0 md:border-none border-b dark:border-zinc-500 list-none"
+        >
+          <a
+            class="text-zinc-600 dark:text-zinc-300 hover:border-b-0"
+            href="/tags/"
+            >Tags</a
+          >
+        </li>
+         
+
+        <li class="h-7 pl-2.5 pr-0 list-none">
+          <button
+            type="button"
+            onclick="toggleMode()"
+            class="h-full"
+            aria-label="Toggle between dark and light mode"
+          >
+            <img class="h-7 w-7 max-h-full mb-1.5 p-1.5 hidden dark:inline"
+            id="ligh-mode-button-img" alt="A sun icon for switching to light
+            mode" src="//localhost:1313/img/light_mode.svg"> <img class="h-7 w-7
+            max-h-full mb-1.5 p-1.5 inline dark:hidden"
+            id="dark-mode-button-img" alt="A moon icon for switching to dark
+            mode" src="//localhost:1313/img/dark_mode.svg">
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+    </header>
+    <main class="content h-card container mt-2 m-auto
+                 leading-loose md:px-0 px-2 z-0"
+          role="main">
+    
+<article class="article h-entry" itemprop="mainEntity" itemscope itemtype="http://schema.org/BlogPosting">
+    <div class="title-container">
+        <h1 class="article-title p-name" itemprop="name">Debugging Rcpp with VSCode</h1>
+        
+        <b><i itemprop="headline" class="article-headline text-lg p-summary">
+            a tutorial and reference
+        </i></b>
+        
+        <div class="flex justify-between items-center">
+            
+            <a class="text-lg text-gray-600 dark:text-gray-400 border-none u-url" href="//localhost:1313/debugging-rcpp-vscode/">
+                <time itemprop="datePublished" class="dt-published"
+                    datetime="2023-10-06T00:00:00Z"
+                    content="2023-10-06T00:00:00Z">
+                    2023.10.06
+                </time>
+            </a>
+            
+            
+        </div>
+        
+    </div>
+
+    <div class="article-content e-content" itemprop="articleBody">
+        <h2 id="preface">Preface</h2>
+<p>The following post details the process of connecting the VSCode debugger with Rcpp, it is a compilation from the following sources:</p>
+<ol>
+<li><a href="https://blog.davisvaughan.com/posts/2022-03-11-using-vs-code-to-debug-r-packages-with-c-code/" target="_blank" >Using VS Code to Debug R Packages with C or C++ Code</a>
+</li>
+<li><a href="https://github.com/renkun-ken/vscode-rcpp-demo/tree/master" target="_blank" >vscode-rcpp-demo (GitHub repo)</a>
+</li>
+<li><a href="https://r-pkgs.org/dependencies-in-practice.html#sec-dependencies-in-imports" target="_blank" >R packages documentation</a>
+</li>
+</ol>
+<p>I am running on a MacBook Pro with the M2 Pro chip, my R version is 4.3.1 and is installed via Homebrew.</p>
+<h2 id="step-0-installing-necessary-r-packages">Step 0: Installing necessary R packages</h2>
+<ol>
+<li><a href="https://github.com/ManuelHentschel/vscDebugger" target="_blank" >vscDebugger</a>
+: An R language connector that connects to the VSCode debugger, for R code only</li>
+<li><a href="https://devtools.r-lib.org/" target="_blank" >devtools</a>
+: Necessary for building the R package</li>
+<li><a href="https://github.com/r-lib/usethis" target="_blank" >usethis</a>
+: For setting up the package skeleton</li>
+<li><a href="https://github.com/r-lib/testthat" target="_blank" >testhat</a>
+: For creating unit-tests</li>
+</ol>
+<h2 id="step-1-getting-vscode-to-work-with-c">Step 1: Getting VSCode to work with C++</h2>
+<p>Install VSCode if you haven&rsquo;t already, and add the following extensions as detailed by Davis Vaughan in the first post above</p>
+<ol>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack" target="_blank" >C/C++ Extension Pack</a>
+</li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=Ikuyadeu.r" target="_blank" >R extension</a>
+</li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb" target="_blank" >CodeLLB</a>
+</li>
+</ol>
+<p>CodeLLB is the debugger that we will connect to Rcpp for debugging.</p>
+<h2 id="step-2-creating-an-r-package">Step 2: Creating an R package</h2>
+<p>I have not been able to avoid this step. Usually for simple applications usually you would just have an .r file and a .cpp file, and in the .r file you might call</p>
+<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#447fcf">library</span>(Rcpp)
+</span></span><span style="display:flex;"><span><span style="color:#447fcf">sourceCpp</span>(<span style="color:#ed9d13">&#39;my-rcpp-implementation.cpp&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic"># declare variables</span>
+</span></span><span style="display:flex;"><span><span style="color:#6ab825;font-weight:bold">...</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#447fcf">cpp_impl</span>(x, y, z)
+</span></span></code></pre></div><p>But it seems that it is not possible to hook LLDB to the R session directly to debug the C++ code (perhaps there is an easy way of doing this, by linking the compiled object to LLDB, see <a href="https://stackoverflow.com/questions/36968721/lldb-not-showing-source-code" target="_blank" >this post</a>
+).</p>
+<p>To debug the C++ code it is necessary to contain it in an R package, which can be created in the following ways:</p>
+<ol>
+<li>Clone the repo from the second link</li>
+<li>Create one using RStudio (File -&gt; New project -&gt; New directory -&gt; R package with Rcpp)</li>
+<li>Using <code>usethis::create_package</code> (See the documentation on GitHub)</li>
+</ol>
+<p>Once the R package has been created, you can move your source files to the package as follows:</p>
+<ol>
+<li>R files -&gt; <code>R/</code> directory</li>
+<li>C++ files -&gt; <code>src/</code> directory</li>
+</ol>
+<h2 id="step-3-setting-up-the-c-configuration-in-vscode">Step 3: Setting up the C++ configuration in VSCode</h2>
+<p>We will now connect the VSCode debugger so that we can debug the Rcpp code. Depending on your operating system and R installation this step will not be exactly the same. So please do not blindly copy-paste what I write here.</p>
+<p>First of all, we need to add the R/Rcpp header files to <code>.vscode/c_cpp_properties.json</code> so that the C/C++ extension can find them. By hitting <code>Cmd+Shift+P</code> in VSCode and typing &rsquo;edit configurations&rsquo; the first dropdown option should look like</p>
+<p><img src="/img/debugging-rcpp-vscode/dropdown.png" alt="dropdown" title="Dropdown"></p>
+<p>Select either (UI) or (JSON), after selecting (JSON) a file will be opened with the following contents:</p>
+<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#6ab825;font-weight:bold">&#34;configurations&#34;</span>: [
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;name&#34;</span>: <span style="color:#ed9d13">&#34;Mac&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;defines&#34;</span>: [],
+</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;macFrameworkPath&#34;</span>: [
+</span></span><span style="display:flex;"><span>                <span style="color:#ed9d13">&#34;/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks&#34;</span>
+</span></span><span style="display:flex;"><span>            ],
+</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;compilerPath&#34;</span>: <span style="color:#ed9d13">&#34;/usr/bin/clang&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;cStandard&#34;</span>: <span style="color:#ed9d13">&#34;c17&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;cppStandard&#34;</span>: <span style="color:#ed9d13">&#34;c++17&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;intelliSenseMode&#34;</span>: <span style="color:#ed9d13">&#34;macos-clang-arm64&#34;</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>    <span style="color:#6ab825;font-weight:bold">&#34;version&#34;</span>: <span style="color:#3677a9">4</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>In the innermost dictionary we will add the include paths for the R/Rcpp header files:</p>
+<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#a61717;background-color:#e3d2d2">...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#6ab825;font-weight:bold">&#34;includePath&#34;</span>: [
+</span></span><span style="display:flex;"><span>        <span style="color:#ed9d13">&#34;${workspaceFolder}/**&#34;</span>, 
+</span></span><span style="display:flex;"><span>        <span style="color:#ed9d13">&#34;/opt/homebrew/lib/R/4.3/site-library/Rcpp/include/*&#34;</span>, 
+</span></span><span style="display:flex;"><span>        <span style="color:#ed9d13">&#34;/opt/homebrew/lib/R/include/*&#34;</span>
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>    <span style="color:#a61717;background-color:#e3d2d2">...</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Your include paths might be different, in which case you need to determine the location of your R installation and from there the paths accordingly. Essentially, you need to find the directories containing the <code>Rcpp.h</code> and <code>R.h</code> files. You can do so by opening the R console and typing:</p>
+<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#447fcf">R.home</span>(<span style="color:#ed9d13">&#34;include&#34;</span>) <span style="color:#999;font-style:italic"># Returns the directory that contains R.h</span>
+</span></span><span style="display:flex;"><span><span style="color:#447fcf">.libPaths</span>() <span style="color:#999;font-style:italic"># Returns directories containing the headers for other packages, you will have to traverse this and find the Rcpp directory </span>
+</span></span></code></pre></div><p>In order for devtools to compile the exported functions, it might be necessary to create a <code>Makevars</code> file in the <code>src/</code> directory and add the following line</p>
+<pre tabindex="0"><code>PKG_CPPFLAGS = -I/opt/homebrew/lib/R/4.3/site-library/Rcpp/include
+</code></pre><p>Replace the path above with the location of your Rcpp header files.</p>
+<h2 id="step-4-exporting-rcpp-functions-namespace">Step 4: Exporting Rcpp functions (<code>NAMESPACE</code>)</h2>
+<p>The <code>NAMESPACE</code> file resides at the root of the package, and specifies the package exports. Getting the <code>NAMESPACE</code> right is crucial for connecting the debugger, you can either modify it manually or use roxygen2 to generate it. The <code>devtools::</code> functions use roxygen2, and is also what I would recommend doing.</p>
+<h3 id="manually">Manually</h3>
+<p>To do it manually you can add the following lines to the file:</p>
+<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#447fcf">useDynLib</span>(pkgname, .registration=<span style="color:#6ab825;font-weight:bold">TRUE</span>) <span style="color:#999;font-style:italic"># Replace with your package name</span>
+</span></span><span style="display:flex;"><span><span style="color:#447fcf">importFrom</span>(Rcpp, evalCpp)
+</span></span><span style="display:flex;"><span><span style="color:#447fcf">exportPattern</span>(<span style="color:#ed9d13">&#34;^[[:alpha:]]+&#34;</span>)
+</span></span></code></pre></div><p>The code above will export all functions from the package whose names start with one or more alphabetic characters.</p>
+<h3 id="using-roxygen2-recommended">Using roxygen2 (Recommended)</h3>
+<p>To use roxygen2 first add the C++ files to the <code>src/</code> directory. Once they have been added, annotate the functions that you want to export with these two lines:</p>
+<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#999;font-style:italic">//&#39; @export
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">// [[Rcpp::export]]
+</span></span></span></code></pre></div><p>The first line tells roxygen2 that the function should be included in <code>NAMESPACE</code> when it is generated, while the second line specifies the Rcpp export. For example, a C++ file could look like:</p>
+<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#cd2828;font-weight:bold">#include</span> <span style="color:#cd2828;font-weight:bold">&lt;Rcpp.h&gt;</span><span style="color:#cd2828;font-weight:bold">
+</span></span></span><span style="display:flex;"><span><span style="color:#cd2828;font-weight:bold">#include</span> <span style="color:#cd2828;font-weight:bold">&lt;random&gt;</span><span style="color:#cd2828;font-weight:bold">
+</span></span></span><span style="display:flex;"><span><span style="color:#cd2828;font-weight:bold"></span><span style="color:#6ab825;font-weight:bold">using</span> <span style="color:#6ab825;font-weight:bold">namespace</span> Rcpp;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">//&#39; @export
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">// [[Rcpp::export]]
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic"></span>NumericVector <span style="color:#447fcf">f_dens_cpp_1</span>(<span style="color:#6ab825;font-weight:bold">const</span> NumericVector&amp; y, 
+</span></span><span style="display:flex;"><span>                             <span style="color:#6ab825;font-weight:bold">const</span> NumericVector&amp; x,
+</span></span><span style="display:flex;"><span>                             <span style="color:#6ab825;font-weight:bold">const</span> NumericVector&amp; z){
+</span></span><span style="display:flex;"><span>  NumericVector ret(y.length());
+</span></span><span style="display:flex;"><span>  <span style="color:#6ab825;font-weight:bold">for</span> (<span style="color:#6ab825;font-weight:bold">int</span> i = <span style="color:#3677a9">0</span>; i &lt; y.length(); i++){
+</span></span><span style="display:flex;"><span>    <span style="color:#6ab825;font-weight:bold">double</span> ans = <span style="color:#3677a9">1</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#6ab825;font-weight:bold">for</span> (<span style="color:#6ab825;font-weight:bold">int</span> j = <span style="color:#3677a9">0</span>; j &lt; x.length(); j++){
+</span></span><span style="display:flex;"><span>      ans *= exp(y[i] * z[j] * x[j] - exp(y[i]*x[j]));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    ret[i] = ans;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#6ab825;font-weight:bold">return</span> ret;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>You can also find another example from <code>vscode-rcpp-demo</code> in the second link above.</p>
+<p>After you have annotated the exported the functions, run</p>
+<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>Rcpp::<span style="color:#447fcf">compileAttributes</span>()
+</span></span></code></pre></div><p>in an R console opened from the package root. The command will generate an <code>RcppExports.R</code> file in the <code>R/</code> directory.</p>
+<p>We now create a <code>pkgname-package.R</code> file in the <code>R/</code> directory via the following command</p>
+<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>usethis::<span style="color:#447fcf">use_package_doc</span>()
+</span></span></code></pre></div><p>Which should result in a file with:</p>
+<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#999;font-style:italic">#&#39; @keywords internal</span>
+</span></span><span style="display:flex;"><span><span style="color:#ed9d13">&#34;_PACKAGE&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">## usethis namespace: start</span>
+</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">## usethis namespace: end</span>
+</span></span><span style="display:flex;"><span><span style="color:#6ab825;font-weight:bold">NULL</span>
+</span></span></code></pre></div><p>You can then add the following two lines to the newly created package documentation:</p>
+<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#999;font-style:italic">#&#39; @keywords internal</span>
+</span></span><span style="display:flex;"><span><span style="color:#ed9d13">&#34;_PACKAGE&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">## usethis namespace: start</span>
+</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">#&#39; @importFrom Rcpp evalCpp</span>
+</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">#&#39; @useDynLib pkgname, .registration=TRUE </span>
+</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">## usethis namespace: end</span>
+</span></span><span style="display:flex;"><span><span style="color:#6ab825;font-weight:bold">NULL</span>
+</span></span></code></pre></div><p>In the line starting with <code>@useDynLib</code> replace <code>pkgname</code> with the name of your package (first line in DESCRIPTION).</p>
+<p>Generate the <code>NAMESPACE</code> now by executing:</p>
+<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>devtools::<span style="color:#447fcf">document</span>()
+</span></span></code></pre></div><h2 id="step-5-creating-a-unit-test-to-debug">Step 5: Creating a unit-test to debug</h2>
+<p>Creating unit-tests is a good practice in general. Unit-tests are concise and standalone pieces of code that can be ran individually, which makes them great for debugging small individual functions &ndash; as is frequently the case programming in R.</p>
+<p>Run the following commands in the package root:</p>
+<pre tabindex="0"><code>usethis::use_testthat()
+usethis::use_test(&#39;my-test&#39;)
+</code></pre><p>A directory <code>testthat/</code> will be created with the new test. In it you can call your Rcpp functions, for example</p>
+<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#999;font-style:italic"># Under tests/testthat/test-my-test.R</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#447fcf">test_that</span>(<span style="color:#ed9d13">&#34;Density works&#34;</span>, {
+</span></span><span style="display:flex;"><span>  dat &lt;- <span style="color:#447fcf">read.csv</span>(<span style="color:#ed9d13">&#39;2_Poisson.csv&#39;</span>)
+</span></span><span style="display:flex;"><span>  z &lt;- dat$z
+</span></span><span style="display:flex;"><span>  x &lt;- dat$x
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  step_size &lt;- <span style="color:#3677a9">0.01</span>
+</span></span><span style="display:flex;"><span>  res &lt;- <span style="color:#447fcf">seq</span>(<span style="color:#3677a9">0</span>, <span style="color:#3677a9">1</span>, step_size)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#999;font-style:italic"># f_dens_cpp_1 is an Rcpp function</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#447fcf">expect_equal</span>(<span style="color:#447fcf">f_dens_cpp_1</span>(res, x, z), <span style="color:#447fcf">c</span>(<span style="color:#3677a9">0</span>, <span style="color:#3677a9">1</span>, <span style="color:#3677a9">2</span>)) <span style="color:#999;font-style:italic"># Assert statement </span>
+</span></span><span style="display:flex;"><span>})
+</span></span></code></pre></div><p>Note that we do not have to import the functions that we are calling, because when we later run tests by calling <code>devtools::test()</code>, the package <code>devtools</code> will import the necessary functions specified in the <code>NAMESPACE</code> automatically.</p>
+<h2 id="step-6-setting-up-the-launch-configuration-in-vscode">Step 6: Setting up the launch configuration in VSCode</h2>
+<p>The <code>.vscode</code> directory should hopefully be created by now in the package root. In there you will add a new file, <code>launch.json</code> with the following contents:</p>
+<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#999;font-style:italic">// Use IntelliSense to learn about possible attributes.
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic"></span>    <span style="color:#999;font-style:italic">// Hover to view descriptions of existing attributes.
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic"></span>    <span style="color:#999;font-style:italic">// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic"></span>    <span style="color:#6ab825;font-weight:bold">&#34;version&#34;</span>: <span style="color:#ed9d13">&#34;0.2.0&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#6ab825;font-weight:bold">&#34;configurations&#34;</span>: [
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;name&#34;</span>: <span style="color:#ed9d13">&#34;(lldb) Launch&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;type&#34;</span>: <span style="color:#ed9d13">&#34;lldb&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;request&#34;</span>: <span style="color:#ed9d13">&#34;launch&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;program&#34;</span>: <span style="color:#ed9d13">&#34;/opt/homebrew/Cellar/r/4.3.1/lib/R/bin/exec/R&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;args&#34;</span>: [
+</span></span><span style="display:flex;"><span>              <span style="color:#ed9d13">&#34;--vanilla&#34;</span>,
+</span></span><span style="display:flex;"><span>              <span style="color:#ed9d13">&#34;-e&#34;</span>,
+</span></span><span style="display:flex;"><span>              <span style="color:#ed9d13">&#34;devtools::test()&#34;</span>
+</span></span><span style="display:flex;"><span>            ],
+</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;env&#34;</span>: {
+</span></span><span style="display:flex;"><span>              <span style="color:#6ab825;font-weight:bold">&#34;R_HOME&#34;</span> : <span style="color:#ed9d13">&#34;/opt/homebrew/Cellar/r/4.3.1/lib/R&#34;</span>
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;terminal&#34;</span>: <span style="color:#ed9d13">&#34;console&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;stopOnEntry&#34;</span>: <span style="color:#6ab825;font-weight:bold">false</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>There might already exist R debugging configurations, in which case append the above configuration to the existing configurations list. There are two things that we have to look out for, which are the <code>&quot;program&quot;</code> and <code>&quot;R_HOME&quot;</code> fields.</p>
+<p>You can find your <code>R_HOME</code> by executing <code>R.home()</code> in an R console. The R program is usually found as <code>$R_HOME/bin/exec/R</code>, make sure that you have the R <strong>binary</strong> and not the execution script. Doing <code>which R</code> will only give you the execution script and not the binary!</p>
+<h2 id="step-7-debugging-the-c-code">Step 7: Debugging the C++ code</h2>
+<p>Navigate now to the C++ code in <code>src/</code>, you should be able to click left to the line number to set a breakpoint
+<img src="/img/debugging-rcpp-vscode/breakpoint.png" alt="breakpoint" title="Breakpoint"></p>
+<p>Click on the debugger tab to the left, you should now see a green button on the top next to the launch configuration, clicking that will start the debugging session</p>
+<p><img src="/img/debugging-rcpp-vscode/debugview.png" alt="debugview" title="Debugging View"></p>
+<p>Once the C++ function has been called, the debugger will break on the breakpoint and it is now possible to inspect variables in the runtime environment</p>
+<p><img src="/img/debugging-rcpp-vscode/debugsession.png" alt="debugsession" title="Debugging Session"></p>
+<p>The debug console on the bottom panel can also be used, here you can to send commands to LLDB to inspect different variables.</p>
+<h2 id="final-remarks">Final remarks</h2>
+<p>In this tutorial I have demonstrated a working setup for debugging Rcpp using VSCode. One thing that I haven&rsquo;t mentioned is how to add the include paths for all projects in VSCode globally. This dissolves the need of creating the <code>c_cpp_properties.json</code> file everytime in each new project. One can execute <code>Cmd+Shift+P</code> and then type &ldquo;user settings&rdquo;, open that as JSON and paste in the following:</p>
+<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#a61717;background-color:#e3d2d2">...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#6ab825;font-weight:bold">&#34;C_Cpp.default.includePath&#34;</span>: [
+</span></span><span style="display:flex;"><span>        <span style="color:#ed9d13">&#34;/opt/homebrew/lib/R/4.3/site-library/Rcpp/include/*&#34;</span>, 
+</span></span><span style="display:flex;"><span>        <span style="color:#ed9d13">&#34;/opt/homebrew/lib/R/include/*&#34;</span>
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>    <span style="color:#a61717;background-color:#e3d2d2">...</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This will add the R/Rcpp include paths to all future projects.</p>
+
+    </div>
+
+    
+<ul class="list-none pl-0 font-sm align-left">
+
+<hr>
+<li class="list-none">
+    Categories:
+    
+    <a class="inline-block mt-2 mr-2 border-none text-neutral-800 dark:text-neutral-200"
+       href="/categories/post">
+    <span class="tag-item dark:bg-zinc-900 dark:hover:bg-zinc-700
+                 hover:bg-zinc-200 bg-zinc-100
+                 dark:border-zinc-600 py-0.5
+                 px-1 rounded-t border-b-2 border-zinc-300
+                 hover:border-zinc-500">
+    Post
+    </span>
+</a>
+</li >
+
+
+<li class="list-none">
+    Tags:
+    
+    <a class="inline-block mt-2 mr-2 border-none text-neutral-800 dark:text-neutral-200"
+       href="/tags/rcpp">
+        <span class="flex flex-row justify-start items-center
+                     dark:bg-zinc-900 dark:hover:bg-zinc-700
+                     hover:bg-zinc-300 bg-zinc-200
+                     dark:border-zinc-600 py-0.5
+                     px-1 rounded-t border-b-2 border-zinc-300
+                     hover:border-zinc-500">
+            
+            <img class="h-4 mr-2 inline" src="//localhost:1313/images/tag_logo.svg"
+                 alt="Logo of a tag: indicates that a tag item follows.">
+            Rcpp
+        </span>
+    </a>
+    
+    <a class="inline-block mt-2 mr-2 border-none text-neutral-800 dark:text-neutral-200"
+       href="/tags/software-development">
+        <span class="flex flex-row justify-start items-center
+                     dark:bg-zinc-900 dark:hover:bg-zinc-700
+                     hover:bg-zinc-300 bg-zinc-200
+                     dark:border-zinc-600 py-0.5
+                     px-1 rounded-t border-b-2 border-zinc-300
+                     hover:border-zinc-500">
+            
+            <img class="h-4 mr-2 inline" src="//localhost:1313/images/tag_logo.svg"
+                 alt="Logo of a tag: indicates that a tag item follows.">
+            software development
+        </span>
+    </a>
+    
+    <a class="inline-block mt-2 mr-2 border-none text-neutral-800 dark:text-neutral-200"
+       href="/tags/statistics">
+        <span class="flex flex-row justify-start items-center
+                     dark:bg-zinc-900 dark:hover:bg-zinc-700
+                     hover:bg-zinc-300 bg-zinc-200
+                     dark:border-zinc-600 py-0.5
+                     px-1 rounded-t border-b-2 border-zinc-300
+                     hover:border-zinc-500">
+            
+            <img class="h-4 mr-2 inline" src="//localhost:1313/images/tag_logo.svg"
+                 alt="Logo of a tag: indicates that a tag item follows.">
+            statistics
+        </span>
+    </a>
+    
+</li>
+
+</ul>
+
+
+    
+
+    
+    <div class="text-neutral-500 mb-4">
+        Last modified <span itemprop="dateModified"
+                            datetime="2023-10-06T00:00:00Z"
+                            content="2023-10-06T00:00:00Z">
+        2023.10.06
+        </span>
+    </div>
+    
+</article>
+
+    </main>
+    <footer class="footer container h-10 text-center mt-1">
+<hr class="my-4">
+  <ul class="pl-0 mt-1">
+    
+    <li class="ml-2 first:before:content-none before:content-['•']
+               inline-block list-none">
+      <a class="ml-2 text-neutral-800
+                dark:text-neutral-400 border-none"
+          href="https://github.com/hugcis/hugo-astatine-theme">Code</a>
+    </li>
+    <li class="ml-2 first:before:content-none before:content-['•']
+                text-neutral-800 dark:text-neutral-400 inline-block list-none">
+      <span class="ml-2">© Jinyang Liu (刘锦阳) 2024</span>
+    </li>
+  </ul>
+</footer>
+
+
+
+  </body>
+</html>

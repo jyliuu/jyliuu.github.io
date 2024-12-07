@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Machine Learning on Jinyang Liu (刘锦阳)</title>
+    <link>//localhost:1313/tags/machine-learning/</link>
+    <description>Recent content in Machine Learning on Jinyang Liu (刘锦阳)</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 01 Aug 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="//localhost:1313/tags/machine-learning/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>BSc Thesis: Super Learners</title>
+      <link>//localhost:1313/super-learners-bsc/</link>
+      <pubDate>Tue, 01 Aug 2023 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/super-learners-bsc/</guid>
+      <description>&lt;p&gt;On the 23rd of June 2023 I defended my BSc thesis: &amp;ldquo;Super Learners&amp;rdquo;. The &lt;a href=&#34;https://github.com/jyliuu/bachelor-thesis/blob/main/bachelordraft/out/main.pdf&#34; target=&#34;_blank&#34; &gt;thesis paper&lt;/a&gt;&#xA; and code for simulations can be found on &lt;a href=&#34;https://github.com/jyliuu/bachelor-thesis&#34; target=&#34;_blank&#34; &gt;GitHub&lt;/a&gt;&#xA;&lt;/p&gt;&#xA;&lt;p&gt;The project was supervised by Prof. Thomas Gerds at the Biostatistics department of UCPH and Prof. Niels Richard Hansen at the MATH department.&lt;/p&gt;&#xA;&lt;h3 id=&#34;abstract&#34;&gt;Abstract&lt;/h3&gt;&#xA;&lt;p&gt;In this thesis we examine super learners and their applicability to binary regression. The super learner is a method for combining predictions from a specified libraryof learning algorithms to create a strong learner. We introduce and prove the oracle property for the discrete super learner, which is extended to the ensemble super&#xA;learner. The oracle results show that given a library of learning algorithms, asymptotically, the super learner will not perform worse than the best algorithm in the library in terms of risk. We then compare the performance of the super learner with other regression algorithms including logistic regression and XGBoost on simulated data. The simulations demonstrate that the super learner achieves minimal risk as the number of observations grows. Finally, a new technique of combining learner predictions to be used by the ensemble super learner is proposed and has shown interesting results.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

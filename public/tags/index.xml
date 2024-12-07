@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Jinyang Liu (刘锦阳)</title>
+    <link>//localhost:1313/tags/</link>
+    <description>Recent content in Tags on Jinyang Liu (刘锦阳)</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 06 Oct 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="//localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Rcpp</title>
+      <link>//localhost:1313/tags/rcpp/</link>
+      <pubDate>Fri, 06 Oct 2023 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/tags/rcpp/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Software Development</title>
+      <link>//localhost:1313/tags/software-development/</link>
+      <pubDate>Fri, 06 Oct 2023 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/tags/software-development/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Statistics</title>
+      <link>//localhost:1313/tags/statistics/</link>
+      <pubDate>Fri, 06 Oct 2023 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/tags/statistics/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Machine Learning</title>
+      <link>//localhost:1313/tags/machine-learning/</link>
+      <pubDate>Tue, 01 Aug 2023 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/tags/machine-learning/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Super Learners</title>
+      <link>//localhost:1313/tags/super-learners/</link>
+      <pubDate>Tue, 01 Aug 2023 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/tags/super-learners/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>
