@@ -4,7 +4,8 @@ theme = "astatine"
 
 preserveTaxonomyNames = true
 rssLimit = 10
-paginate = 10
+[pagination]
+    pagerSize = 10
 
 # Code highlighting
 pygmentsCodefences = true
@@ -66,5 +67,3 @@ pygmentsStyle = "native"
     
     # Enable pingback and webmention via webmention.io
     # webmention = "hugocisneros.com"
-
-

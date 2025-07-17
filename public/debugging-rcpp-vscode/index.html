@@ -151,9 +151,9 @@
             
             <a class="text-lg text-gray-600 dark:text-gray-400 border-none u-url" href="//localhost:1313/debugging-rcpp-vscode/">
                 <time itemprop="datePublished" class="dt-published"
-                    datetime="2023-10-06T00:00:00Z"
-                    content="2023-10-06T00:00:00Z">
-                    2023.10.06
+                    datetime="2025-07-17T00:00:00Z"
+                    content="2025-07-17T00:00:00Z">
+                    2025.07.17
                 </time>
             </a>
             
@@ -164,7 +164,7 @@
 
     <div class="article-content e-content" itemprop="articleBody">
         <h2 id="preface">Preface</h2>
-<p>The following post details the process of connecting the VSCode debugger with Rcpp, it is a compilation from the following sources:</p>
+<p>This post walks you through connecting the VSCode debugger to Rcpp code. It’s a practical guide, drawing from these resources:</p>
 <ol>
 <li><a href="https://blog.davisvaughan.com/posts/2022-03-11-using-vs-code-to-debug-r-packages-with-c-code/" target="_blank" >Using VS Code to Debug R Packages with C or C++ Code</a>
 </li>
@@ -173,20 +173,21 @@
 <li><a href="https://r-pkgs.org/dependencies-in-practice.html#sec-dependencies-in-imports" target="_blank" >R packages documentation</a>
 </li>
 </ol>
-<p>I am running on a MacBook Pro with the M2 Pro chip, my R version is 4.3.1 and is installed via Homebrew.</p>
-<h2 id="step-0-installing-necessary-r-packages">Step 0: Installing necessary R packages</h2>
+<p>For reference, I’m using a MacBook Pro (M2 Pro chip) with R 4.3.1 installed via Homebrew.</p>
+<h2 id="step-0-install-required-r-packages">Step 0: Install Required R Packages</h2>
+<p>Before diving in, make sure you have these R packages installed:</p>
 <ol>
 <li><a href="https://github.com/ManuelHentschel/vscDebugger" target="_blank" >vscDebugger</a>
-: An R language connector that connects to the VSCode debugger, for R code only</li>
+: Connects R code to the VSCode debugger</li>
 <li><a href="https://devtools.r-lib.org/" target="_blank" >devtools</a>
-: Necessary for building the R package</li>
+: For building R packages</li>
 <li><a href="https://github.com/r-lib/usethis" target="_blank" >usethis</a>
-: For setting up the package skeleton</li>
-<li><a href="https://github.com/r-lib/testthat" target="_blank" >testhat</a>
-: For creating unit-tests</li>
+: Helps set up package skeletons</li>
+<li><a href="https://github.com/r-lib/testthat" target="_blank" >testthat</a>
+: For unit testing</li>
 </ol>
-<h2 id="step-1-getting-vscode-to-work-with-c">Step 1: Getting VSCode to work with C++</h2>
-<p>Install VSCode if you haven&rsquo;t already, and add the following extensions as detailed by Davis Vaughan in the first post above</p>
+<h2 id="step-1-set-up-vscode-for-c">Step 1: Set Up VSCode for C++</h2>
+<p>First, install VSCode if you haven’t already. Then, add these extensions (as recommended by Davis Vaughan):</p>
 <ol>
 <li><a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack" target="_blank" >C/C++ Extension Pack</a>
 </li>
@@ -195,190 +196,253 @@
 <li><a href="https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb" target="_blank" >CodeLLB</a>
 </li>
 </ol>
-<p>CodeLLB is the debugger that we will connect to Rcpp for debugging.</p>
-<h2 id="step-2-creating-an-r-package">Step 2: Creating an R package</h2>
-<p>I have not been able to avoid this step. Usually for simple applications usually you would just have an .r file and a .cpp file, and in the .r file you might call</p>
-<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#447fcf">library</span>(Rcpp)
-</span></span><span style="display:flex;"><span><span style="color:#447fcf">sourceCpp</span>(<span style="color:#ed9d13">&#39;my-rcpp-implementation.cpp&#39;</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic"># declare variables</span>
-</span></span><span style="display:flex;"><span><span style="color:#6ab825;font-weight:bold">...</span> 
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#447fcf">cpp_impl</span>(x, y, z)
-</span></span></code></pre></div><p>But it seems that it is not possible to hook LLDB to the R session directly to debug the C++ code (perhaps there is an easy way of doing this, by linking the compiled object to LLDB, see <a href="https://stackoverflow.com/questions/36968721/lldb-not-showing-source-code" target="_blank" >this post</a>
+<p>CodeLLB is the debugger we’ll use to connect to Rcpp.</p>
+<h2 id="step-2-create-an-r-package">Step 2: Create an R Package</h2>
+<p>To debug C++ code with Rcpp, you’ll need to wrap your code in an R package. While it’s tempting to just use an <code>.r</code> and a <code>.cpp</code> file together, LLDB can’t easily hook into the C++ code unless it’s part of a package (see <a href="https://stackoverflow.com/questions/36968721/lldb-not-showing-source-code" target="_blank" >this StackOverflow post</a>
 ).</p>
-<p>To debug the C++ code it is necessary to contain it in an R package, which can be created in the following ways:</p>
+<p>Here’s a quick example of what you might try without a package:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(Rcpp)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">sourceCpp</span>(<span style="color:#e6db74">&#39;my-rcpp-implementation.cpp&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># declare variables</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">...</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">cpp_impl</span>(x, y, z)
+</span></span></code></pre></div><p>Unfortunately, LLDB won’t attach to the C++ code in this setup, so packaging is necessary.</p>
+<p>You can create a package by:</p>
 <ol>
-<li>Clone the repo from the second link</li>
-<li>Create one using RStudio (File -&gt; New project -&gt; New directory -&gt; R package with Rcpp)</li>
-<li>Using <code>usethis::create_package</code> (See the documentation on GitHub)</li>
+<li>Cloning the demo repo above</li>
+<li>Using RStudio (File → New Project → New Directory → R Package with Rcpp)</li>
+<li>Running <code>usethis::create_package()</code> in R</li>
 </ol>
-<p>Once the R package has been created, you can move your source files to the package as follows:</p>
-<ol>
-<li>R files -&gt; <code>R/</code> directory</li>
-<li>C++ files -&gt; <code>src/</code> directory</li>
-</ol>
-<h2 id="step-3-setting-up-the-c-configuration-in-vscode">Step 3: Setting up the C++ configuration in VSCode</h2>
-<p>We will now connect the VSCode debugger so that we can debug the Rcpp code. Depending on your operating system and R installation this step will not be exactly the same. So please do not blindly copy-paste what I write here.</p>
-<p>First of all, we need to add the R/Rcpp header files to <code>.vscode/c_cpp_properties.json</code> so that the C/C++ extension can find them. By hitting <code>Cmd+Shift+P</code> in VSCode and typing &rsquo;edit configurations&rsquo; the first dropdown option should look like</p>
+<p>Once your package is set up, move your files:</p>
+<ul>
+<li>R files → <code>R/</code> directory</li>
+<li>C++ files → <code>src/</code> directory</li>
+</ul>
+<h2 id="step-3-configure-c-in-vscode">Step 3: Configure C++ in VSCode</h2>
+<p>We will now connect the VSCode debugger so that we can debug the Rcpp code. Depending on your operating system and R installation this step will not be exactly the same, so don’t copy-paste blindly—adapt paths and settings as needed.</p>
+<p>Open the command palette (<code>Cmd+Shift+P</code>), type “edit configurations,” and select the C++ configuration. You might see a UI dropdown like this:</p>
 <p><img src="/img/debugging-rcpp-vscode/dropdown.png" alt="dropdown" title="Dropdown"></p>
-<p>Select either (UI) or (JSON), after selecting (JSON) a file will be opened with the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#6ab825;font-weight:bold">&#34;configurations&#34;</span>: [
+<p>If you choose JSON, you’ll get:</p>
+<p>Now, let’s help VSCode find the R and Rcpp header files. Open the command palette (<code>Cmd+Shift+P</code>), type “edit configurations,” and select the C++ configuration (choose JSON if prompted). You’ll see something like:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;configurations&#34;</span>: [
 </span></span><span style="display:flex;"><span>        {
-</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;name&#34;</span>: <span style="color:#ed9d13">&#34;Mac&#34;</span>,
-</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;defines&#34;</span>: [],
-</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;macFrameworkPath&#34;</span>: [
-</span></span><span style="display:flex;"><span>                <span style="color:#ed9d13">&#34;/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;Mac&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;defines&#34;</span>: [],
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;macFrameworkPath&#34;</span>: [
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks&#34;</span>
 </span></span><span style="display:flex;"><span>            ],
-</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;compilerPath&#34;</span>: <span style="color:#ed9d13">&#34;/usr/bin/clang&#34;</span>,
-</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;cStandard&#34;</span>: <span style="color:#ed9d13">&#34;c17&#34;</span>,
-</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;cppStandard&#34;</span>: <span style="color:#ed9d13">&#34;c++17&#34;</span>,
-</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;intelliSenseMode&#34;</span>: <span style="color:#ed9d13">&#34;macos-clang-arm64&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;compilerPath&#34;</span>: <span style="color:#e6db74">&#34;/usr/bin/clang&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;cStandard&#34;</span>: <span style="color:#e6db74">&#34;c17&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;cppStandard&#34;</span>: <span style="color:#e6db74">&#34;c++17&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;intelliSenseMode&#34;</span>: <span style="color:#e6db74">&#34;macos-clang-arm64&#34;</span>
 </span></span><span style="display:flex;"><span>        }
 </span></span><span style="display:flex;"><span>    ],
-</span></span><span style="display:flex;"><span>    <span style="color:#6ab825;font-weight:bold">&#34;version&#34;</span>: <span style="color:#3677a9">4</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;version&#34;</span>: <span style="color:#ae81ff">4</span>
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>In the innermost dictionary we will add the include paths for the R/Rcpp header files:</p>
-<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#a61717;background-color:#e3d2d2">...</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#6ab825;font-weight:bold">&#34;includePath&#34;</span>: [
-</span></span><span style="display:flex;"><span>        <span style="color:#ed9d13">&#34;${workspaceFolder}/**&#34;</span>, 
-</span></span><span style="display:flex;"><span>        <span style="color:#ed9d13">&#34;/opt/homebrew/lib/R/4.3/site-library/Rcpp/include/*&#34;</span>, 
-</span></span><span style="display:flex;"><span>        <span style="color:#ed9d13">&#34;/opt/homebrew/lib/R/include/*&#34;</span>
+</span></span></code></pre></div><p>In the innermost object we will add the include paths for the R/Rcpp header files:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;includePath&#34;</span>: [
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;${workspaceFolder}/**&#34;</span>, 
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;/opt/homebrew/lib/R/4.3/site-library/Rcpp/include/*&#34;</span>, 
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;/opt/homebrew/lib/R/include/*&#34;</span>
 </span></span><span style="display:flex;"><span>    ]
-</span></span><span style="display:flex;"><span>    <span style="color:#a61717;background-color:#e3d2d2">...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">...</span>
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>Your include paths might be different, in which case you need to determine the location of your R installation and from there the paths accordingly. Essentially, you need to find the directories containing the <code>Rcpp.h</code> and <code>R.h</code> files. You can do so by opening the R console and typing:</p>
-<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#447fcf">R.home</span>(<span style="color:#ed9d13">&#34;include&#34;</span>) <span style="color:#999;font-style:italic"># Returns the directory that contains R.h</span>
-</span></span><span style="display:flex;"><span><span style="color:#447fcf">.libPaths</span>() <span style="color:#999;font-style:italic"># Returns directories containing the headers for other packages, you will have to traverse this and find the Rcpp directory </span>
-</span></span></code></pre></div><p>In order for devtools to compile the exported functions, it might be necessary to create a <code>Makevars</code> file in the <code>src/</code> directory and add the following line</p>
-<pre tabindex="0"><code>PKG_CPPFLAGS = -I/opt/homebrew/lib/R/4.3/site-library/Rcpp/include
-</code></pre><p>Replace the path above with the location of your Rcpp header files.</p>
-<h2 id="step-4-exporting-rcpp-functions-namespace">Step 4: Exporting Rcpp functions (<code>NAMESPACE</code>)</h2>
-<p>The <code>NAMESPACE</code> file resides at the root of the package, and specifies the package exports. Getting the <code>NAMESPACE</code> right is crucial for connecting the debugger, you can either modify it manually or use roxygen2 to generate it. The <code>devtools::</code> functions use roxygen2, and is also what I would recommend doing.</p>
-<h3 id="manually">Manually</h3>
-<p>To do it manually you can add the following lines to the file:</p>
-<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#447fcf">useDynLib</span>(pkgname, .registration=<span style="color:#6ab825;font-weight:bold">TRUE</span>) <span style="color:#999;font-style:italic"># Replace with your package name</span>
-</span></span><span style="display:flex;"><span><span style="color:#447fcf">importFrom</span>(Rcpp, evalCpp)
-</span></span><span style="display:flex;"><span><span style="color:#447fcf">exportPattern</span>(<span style="color:#ed9d13">&#34;^[[:alpha:]]+&#34;</span>)
-</span></span></code></pre></div><p>The code above will export all functions from the package whose names start with one or more alphabetic characters.</p>
-<h3 id="using-roxygen2-recommended">Using roxygen2 (Recommended)</h3>
-<p>To use roxygen2 first add the C++ files to the <code>src/</code> directory. Once they have been added, annotate the functions that you want to export with these two lines:</p>
-<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#999;font-style:italic">//&#39; @export
-</span></span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">// [[Rcpp::export]]
-</span></span></span></code></pre></div><p>The first line tells roxygen2 that the function should be included in <code>NAMESPACE</code> when it is generated, while the second line specifies the Rcpp export. For example, a C++ file could look like:</p>
-<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#cd2828;font-weight:bold">#include</span> <span style="color:#cd2828;font-weight:bold">&lt;Rcpp.h&gt;</span><span style="color:#cd2828;font-weight:bold">
-</span></span></span><span style="display:flex;"><span><span style="color:#cd2828;font-weight:bold">#include</span> <span style="color:#cd2828;font-weight:bold">&lt;random&gt;</span><span style="color:#cd2828;font-weight:bold">
-</span></span></span><span style="display:flex;"><span><span style="color:#cd2828;font-weight:bold"></span><span style="color:#6ab825;font-weight:bold">using</span> <span style="color:#6ab825;font-weight:bold">namespace</span> Rcpp;
+</span></span></code></pre></div><p>Your paths may differ—find them by running these in R:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#a6e22e">R.home</span>(<span style="color:#e6db74">&#34;include&#34;</span>) <span style="color:#75715e"># Directory with R.h</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">.libPaths</span>() <span style="color:#75715e"># Find Rcpp directory</span>
+</span></span></code></pre></div><p>If you run into compilation issues, create a <code>Makevars</code> file in <code>src/</code> with:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>PKG_CPPFLAGS <span style="color:#f92672">=</span> -I/opt/homebrew/lib/R/4.3/site-library/Rcpp/include
+</span></span></code></pre></div><p>Adjust the path as needed for your setup.</p>
+<h2 id="step-4-export-rcpp-functions-namespace">Step 4: Export Rcpp Functions (NAMESPACE)</h2>
+<p>The <code>NAMESPACE</code> file at your package root controls what gets exported. Getting this right is key for debugging.</p>
+<p><strong>Manual method:</strong>
+Add these lines to <code>NAMESPACE</code> (replace <code>pkgname</code> with your package name):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#a6e22e">useDynLib</span>(pkgname, .registration<span style="color:#f92672">=</span><span style="color:#66d9ef">TRUE</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">importFrom</span>(Rcpp, evalCpp)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">exportPattern</span>(<span style="color:#e6db74">&#34;^[[:alpha:]]+&#34;</span>)
+</span></span></code></pre></div><p><strong>Recommended: Use roxygen2</strong></p>
+<ol>
+<li>In your C++ files (in <code>src/</code>), annotate exported functions:</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">//&#39; @export
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// [[Rcpp::export]]
+</span></span></span></code></pre></div><p>For example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;Rcpp.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;random&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">using</span> <span style="color:#66d9ef">namespace</span> Rcpp;
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">//&#39; @export
-</span></span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">// [[Rcpp::export]]
-</span></span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic"></span>NumericVector <span style="color:#447fcf">f_dens_cpp_1</span>(<span style="color:#6ab825;font-weight:bold">const</span> NumericVector&amp; y, 
-</span></span><span style="display:flex;"><span>                             <span style="color:#6ab825;font-weight:bold">const</span> NumericVector&amp; x,
-</span></span><span style="display:flex;"><span>                             <span style="color:#6ab825;font-weight:bold">const</span> NumericVector&amp; z){
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//&#39; @export
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// [[Rcpp::export]]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>NumericVector <span style="color:#a6e22e">f_dens_cpp_1</span>(<span style="color:#66d9ef">const</span> NumericVector<span style="color:#f92672">&amp;</span> y, 
+</span></span><span style="display:flex;"><span>                             <span style="color:#66d9ef">const</span> NumericVector<span style="color:#f92672">&amp;</span> x,
+</span></span><span style="display:flex;"><span>                             <span style="color:#66d9ef">const</span> NumericVector<span style="color:#f92672">&amp;</span> z){
 </span></span><span style="display:flex;"><span>  NumericVector ret(y.length());
-</span></span><span style="display:flex;"><span>  <span style="color:#6ab825;font-weight:bold">for</span> (<span style="color:#6ab825;font-weight:bold">int</span> i = <span style="color:#3677a9">0</span>; i &lt; y.length(); i++){
-</span></span><span style="display:flex;"><span>    <span style="color:#6ab825;font-weight:bold">double</span> ans = <span style="color:#3677a9">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#6ab825;font-weight:bold">for</span> (<span style="color:#6ab825;font-weight:bold">int</span> j = <span style="color:#3677a9">0</span>; j &lt; x.length(); j++){
-</span></span><span style="display:flex;"><span>      ans *= exp(y[i] * z[j] * x[j] - exp(y[i]*x[j]));
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> y.length(); i<span style="color:#f92672">++</span>){
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">double</span> ans <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; j <span style="color:#f92672">&lt;</span> x.length(); j<span style="color:#f92672">++</span>){
+</span></span><span style="display:flex;"><span>      ans <span style="color:#f92672">*=</span> exp(y[i] <span style="color:#f92672">*</span> z[j] <span style="color:#f92672">*</span> x[j] <span style="color:#f92672">-</span> exp(y[i]<span style="color:#f92672">*</span>x[j]));
 </span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    ret[i] = ans;
+</span></span><span style="display:flex;"><span>    ret[i] <span style="color:#f92672">=</span> ans;
 </span></span><span style="display:flex;"><span>  }
-</span></span><span style="display:flex;"><span>  <span style="color:#6ab825;font-weight:bold">return</span> ret;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> ret;
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>You can also find another example from <code>vscode-rcpp-demo</code> in the second link above.</p>
-<p>After you have annotated the exported the functions, run</p>
-<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>Rcpp::<span style="color:#447fcf">compileAttributes</span>()
-</span></span></code></pre></div><p>in an R console opened from the package root. The command will generate an <code>RcppExports.R</code> file in the <code>R/</code> directory.</p>
-<p>We now create a <code>pkgname-package.R</code> file in the <code>R/</code> directory via the following command</p>
-<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>usethis::<span style="color:#447fcf">use_package_doc</span>()
-</span></span></code></pre></div><p>Which should result in a file with:</p>
-<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#999;font-style:italic">#&#39; @keywords internal</span>
-</span></span><span style="display:flex;"><span><span style="color:#ed9d13">&#34;_PACKAGE&#34;</span>
+</span></span></code></pre></div><ol start="2">
+<li>Run this in your package root to generate Rcpp exports:</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>Rcpp<span style="color:#f92672">::</span><span style="color:#a6e22e">compileAttributes</span>()
+</span></span></code></pre></div><ol start="3">
+<li>Create package documentation:</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>usethis<span style="color:#f92672">::</span><span style="color:#a6e22e">use_package_doc</span>()
+</span></span></code></pre></div><p>This creates a file like:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e">#&#39; @keywords internal</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;_PACKAGE&#34;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">## usethis namespace: start</span>
-</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">## usethis namespace: end</span>
-</span></span><span style="display:flex;"><span><span style="color:#6ab825;font-weight:bold">NULL</span>
-</span></span></code></pre></div><p>You can then add the following two lines to the newly created package documentation:</p>
-<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#999;font-style:italic">#&#39; @keywords internal</span>
-</span></span><span style="display:flex;"><span><span style="color:#ed9d13">&#34;_PACKAGE&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## usethis namespace: start</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## usethis namespace: end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">NULL</span>
+</span></span></code></pre></div><ol start="4">
+<li>Add these lines (again, replace <code>pkgname</code>):</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e">#&#39; @importFrom Rcpp evalCpp</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#&#39; @useDynLib pkgname, .registration=TRUE</span>
+</span></span></code></pre></div><ol start="5">
+<li>Finally, generate the <code>NAMESPACE</code>:</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>devtools<span style="color:#f92672">::</span><span style="color:#a6e22e">document</span>()
+</span></span></code></pre></div><h2 id="step-5-write-a-unit-test-for-debugging">Step 5: Write a Unit Test for Debugging</h2>
+<p>Unit tests are invaluable for debugging. They let you run small, focused pieces of code—perfect for stepping through C++ functions.</p>
+<p>From your package root, run:</p>
+
+
+
+<div class="goat svg-container ">
+  
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      font-family="Menlo,Lucida Console,monospace"
+      
+        viewBox="0 0 232 41"
+      >
+      <g transform='translate(8,16)'>
+<text text-anchor='middle' x='0' y='4' fill='currentColor' style='font-size:1em'>u</text>
+<text text-anchor='middle' x='0' y='20' fill='currentColor' style='font-size:1em'>u</text>
+<text text-anchor='middle' x='8' y='4' fill='currentColor' style='font-size:1em'>s</text>
+<text text-anchor='middle' x='8' y='20' fill='currentColor' style='font-size:1em'>s</text>
+<text text-anchor='middle' x='16' y='4' fill='currentColor' style='font-size:1em'>e</text>
+<text text-anchor='middle' x='16' y='20' fill='currentColor' style='font-size:1em'>e</text>
+<text text-anchor='middle' x='24' y='4' fill='currentColor' style='font-size:1em'>t</text>
+<text text-anchor='middle' x='24' y='20' fill='currentColor' style='font-size:1em'>t</text>
+<text text-anchor='middle' x='32' y='4' fill='currentColor' style='font-size:1em'>h</text>
+<text text-anchor='middle' x='32' y='20' fill='currentColor' style='font-size:1em'>h</text>
+<text text-anchor='middle' x='40' y='4' fill='currentColor' style='font-size:1em'>i</text>
+<text text-anchor='middle' x='40' y='20' fill='currentColor' style='font-size:1em'>i</text>
+<text text-anchor='middle' x='48' y='4' fill='currentColor' style='font-size:1em'>s</text>
+<text text-anchor='middle' x='48' y='20' fill='currentColor' style='font-size:1em'>s</text>
+<text text-anchor='middle' x='56' y='4' fill='currentColor' style='font-size:1em'>:</text>
+<text text-anchor='middle' x='56' y='20' fill='currentColor' style='font-size:1em'>:</text>
+<text text-anchor='middle' x='64' y='4' fill='currentColor' style='font-size:1em'>:</text>
+<text text-anchor='middle' x='64' y='20' fill='currentColor' style='font-size:1em'>:</text>
+<text text-anchor='middle' x='72' y='4' fill='currentColor' style='font-size:1em'>u</text>
+<text text-anchor='middle' x='72' y='20' fill='currentColor' style='font-size:1em'>u</text>
+<text text-anchor='middle' x='80' y='4' fill='currentColor' style='font-size:1em'>s</text>
+<text text-anchor='middle' x='80' y='20' fill='currentColor' style='font-size:1em'>s</text>
+<text text-anchor='middle' x='88' y='4' fill='currentColor' style='font-size:1em'>e</text>
+<text text-anchor='middle' x='88' y='20' fill='currentColor' style='font-size:1em'>e</text>
+<text text-anchor='middle' x='96' y='4' fill='currentColor' style='font-size:1em'>_</text>
+<text text-anchor='middle' x='96' y='20' fill='currentColor' style='font-size:1em'>_</text>
+<text text-anchor='middle' x='104' y='4' fill='currentColor' style='font-size:1em'>t</text>
+<text text-anchor='middle' x='104' y='20' fill='currentColor' style='font-size:1em'>t</text>
+<text text-anchor='middle' x='112' y='4' fill='currentColor' style='font-size:1em'>e</text>
+<text text-anchor='middle' x='112' y='20' fill='currentColor' style='font-size:1em'>e</text>
+<text text-anchor='middle' x='120' y='4' fill='currentColor' style='font-size:1em'>s</text>
+<text text-anchor='middle' x='120' y='20' fill='currentColor' style='font-size:1em'>s</text>
+<text text-anchor='middle' x='128' y='4' fill='currentColor' style='font-size:1em'>t</text>
+<text text-anchor='middle' x='128' y='20' fill='currentColor' style='font-size:1em'>t</text>
+<text text-anchor='middle' x='136' y='4' fill='currentColor' style='font-size:1em'>t</text>
+<text text-anchor='middle' x='136' y='20' fill='currentColor' style='font-size:1em'>(</text>
+<text text-anchor='middle' x='144' y='4' fill='currentColor' style='font-size:1em'>h</text>
+<text text-anchor='middle' x='144' y='20' fill='currentColor' style='font-size:1em'>'</text>
+<text text-anchor='middle' x='152' y='4' fill='currentColor' style='font-size:1em'>a</text>
+<text text-anchor='middle' x='152' y='20' fill='currentColor' style='font-size:1em'>m</text>
+<text text-anchor='middle' x='160' y='4' fill='currentColor' style='font-size:1em'>t</text>
+<text text-anchor='middle' x='160' y='20' fill='currentColor' style='font-size:1em'>y</text>
+<text text-anchor='middle' x='168' y='4' fill='currentColor' style='font-size:1em'>(</text>
+<text text-anchor='middle' x='168' y='20' fill='currentColor' style='font-size:1em'>-</text>
+<text text-anchor='middle' x='176' y='4' fill='currentColor' style='font-size:1em'>)</text>
+<text text-anchor='middle' x='176' y='20' fill='currentColor' style='font-size:1em'>t</text>
+<text text-anchor='middle' x='184' y='20' fill='currentColor' style='font-size:1em'>e</text>
+<text text-anchor='middle' x='192' y='20' fill='currentColor' style='font-size:1em'>s</text>
+<text text-anchor='middle' x='200' y='20' fill='currentColor' style='font-size:1em'>t</text>
+<text text-anchor='middle' x='208' y='20' fill='currentColor' style='font-size:1em'>'</text>
+<text text-anchor='middle' x='216' y='20' fill='currentColor' style='font-size:1em'>)</text>
+</g>
+
+    </svg>
+  
+</div>
+<p>This creates a <code>testthat/</code> directory. In your test file, you can call your Rcpp functions directly:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># tests/testthat/test-my-test.R</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">test_that</span>(<span style="color:#e6db74">&#34;Density works&#34;</span>, {
+</span></span><span style="display:flex;"><span>  dat <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">read.csv</span>(<span style="color:#e6db74">&#39;2_Poisson.csv&#39;</span>)
+</span></span><span style="display:flex;"><span>  z <span style="color:#f92672">&lt;-</span> dat<span style="color:#f92672">$</span>z
+</span></span><span style="display:flex;"><span>  x <span style="color:#f92672">&lt;-</span> dat<span style="color:#f92672">$</span>x
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">## usethis namespace: start</span>
-</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">#&#39; @importFrom Rcpp evalCpp</span>
-</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">#&#39; @useDynLib pkgname, .registration=TRUE </span>
-</span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic">## usethis namespace: end</span>
-</span></span><span style="display:flex;"><span><span style="color:#6ab825;font-weight:bold">NULL</span>
-</span></span></code></pre></div><p>In the line starting with <code>@useDynLib</code> replace <code>pkgname</code> with the name of your package (first line in DESCRIPTION).</p>
-<p>Generate the <code>NAMESPACE</code> now by executing:</p>
-<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>devtools::<span style="color:#447fcf">document</span>()
-</span></span></code></pre></div><h2 id="step-5-creating-a-unit-test-to-debug">Step 5: Creating a unit-test to debug</h2>
-<p>Creating unit-tests is a good practice in general. Unit-tests are concise and standalone pieces of code that can be ran individually, which makes them great for debugging small individual functions &ndash; as is frequently the case programming in R.</p>
-<p>Run the following commands in the package root:</p>
-<pre tabindex="0"><code>usethis::use_testthat()
-usethis::use_test(&#39;my-test&#39;)
-</code></pre><p>A directory <code>testthat/</code> will be created with the new test. In it you can call your Rcpp functions, for example</p>
-<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#999;font-style:italic"># Under tests/testthat/test-my-test.R</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#447fcf">test_that</span>(<span style="color:#ed9d13">&#34;Density works&#34;</span>, {
-</span></span><span style="display:flex;"><span>  dat &lt;- <span style="color:#447fcf">read.csv</span>(<span style="color:#ed9d13">&#39;2_Poisson.csv&#39;</span>)
-</span></span><span style="display:flex;"><span>  z &lt;- dat$z
-</span></span><span style="display:flex;"><span>  x &lt;- dat$x
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  step_size &lt;- <span style="color:#3677a9">0.01</span>
-</span></span><span style="display:flex;"><span>  res &lt;- <span style="color:#447fcf">seq</span>(<span style="color:#3677a9">0</span>, <span style="color:#3677a9">1</span>, step_size)
+</span></span><span style="display:flex;"><span>  step_size <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">0.01</span>
+</span></span><span style="display:flex;"><span>  res <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, step_size)
 </span></span><span style="display:flex;"><span>  
-</span></span><span style="display:flex;"><span>  <span style="color:#999;font-style:italic"># f_dens_cpp_1 is an Rcpp function</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#447fcf">expect_equal</span>(<span style="color:#447fcf">f_dens_cpp_1</span>(res, x, z), <span style="color:#447fcf">c</span>(<span style="color:#3677a9">0</span>, <span style="color:#3677a9">1</span>, <span style="color:#3677a9">2</span>)) <span style="color:#999;font-style:italic"># Assert statement </span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># f_dens_cpp_1 is an Rcpp function</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">expect_equal</span>(<span style="color:#a6e22e">f_dens_cpp_1</span>(res, x, z), <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>))
 </span></span><span style="display:flex;"><span>})
-</span></span></code></pre></div><p>Note that we do not have to import the functions that we are calling, because when we later run tests by calling <code>devtools::test()</code>, the package <code>devtools</code> will import the necessary functions specified in the <code>NAMESPACE</code> automatically.</p>
-<h2 id="step-6-setting-up-the-launch-configuration-in-vscode">Step 6: Setting up the launch configuration in VSCode</h2>
-<p>The <code>.vscode</code> directory should hopefully be created by now in the package root. In there you will add a new file, <code>launch.json</code> with the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#999;font-style:italic">// Use IntelliSense to learn about possible attributes.
-</span></span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic"></span>    <span style="color:#999;font-style:italic">// Hover to view descriptions of existing attributes.
-</span></span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic"></span>    <span style="color:#999;font-style:italic">// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-</span></span></span><span style="display:flex;"><span><span style="color:#999;font-style:italic"></span>    <span style="color:#6ab825;font-weight:bold">&#34;version&#34;</span>: <span style="color:#ed9d13">&#34;0.2.0&#34;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#6ab825;font-weight:bold">&#34;configurations&#34;</span>: [
+</span></span></code></pre></div><p>No need to import the functions—they’re available when you run <code>devtools::test()</code>.</p>
+<h2 id="step-6-set-up-the-launch-configuration-in-vscode">Step 6: Set Up the Launch Configuration in VSCode</h2>
+<p>By now, you should have a <code>.vscode</code> directory in your package root. Add a <code>launch.json</code> file with:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#75715e">// Use IntelliSense to learn about possible attributes.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Hover to view descriptions of existing attributes.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;version&#34;</span>: <span style="color:#e6db74">&#34;0.2.0&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;configurations&#34;</span>: [
 </span></span><span style="display:flex;"><span>        {
-</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;name&#34;</span>: <span style="color:#ed9d13">&#34;(lldb) Launch&#34;</span>,
-</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;type&#34;</span>: <span style="color:#ed9d13">&#34;lldb&#34;</span>,
-</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;request&#34;</span>: <span style="color:#ed9d13">&#34;launch&#34;</span>,
-</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;program&#34;</span>: <span style="color:#ed9d13">&#34;/opt/homebrew/Cellar/r/4.3.1/lib/R/bin/exec/R&#34;</span>,
-</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;args&#34;</span>: [
-</span></span><span style="display:flex;"><span>              <span style="color:#ed9d13">&#34;--vanilla&#34;</span>,
-</span></span><span style="display:flex;"><span>              <span style="color:#ed9d13">&#34;-e&#34;</span>,
-</span></span><span style="display:flex;"><span>              <span style="color:#ed9d13">&#34;devtools::test()&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;(lldb) Launch&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;lldb&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;request&#34;</span>: <span style="color:#e6db74">&#34;launch&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;program&#34;</span>: <span style="color:#e6db74">&#34;/opt/homebrew/Cellar/r/4.3.1/lib/R/bin/exec/R&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;args&#34;</span>: [
+</span></span><span style="display:flex;"><span>              <span style="color:#e6db74">&#34;--vanilla&#34;</span>,
+</span></span><span style="display:flex;"><span>              <span style="color:#e6db74">&#34;-e&#34;</span>,
+</span></span><span style="display:flex;"><span>              <span style="color:#e6db74">&#34;devtools::test()&#34;</span>
 </span></span><span style="display:flex;"><span>            ],
-</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;env&#34;</span>: {
-</span></span><span style="display:flex;"><span>              <span style="color:#6ab825;font-weight:bold">&#34;R_HOME&#34;</span> : <span style="color:#ed9d13">&#34;/opt/homebrew/Cellar/r/4.3.1/lib/R&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;env&#34;</span>: {
+</span></span><span style="display:flex;"><span>              <span style="color:#f92672">&#34;R_HOME&#34;</span> : <span style="color:#e6db74">&#34;/opt/homebrew/Cellar/r/4.3.1/lib/R&#34;</span>
 </span></span><span style="display:flex;"><span>            },
-</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;terminal&#34;</span>: <span style="color:#ed9d13">&#34;console&#34;</span>,
-</span></span><span style="display:flex;"><span>            <span style="color:#6ab825;font-weight:bold">&#34;stopOnEntry&#34;</span>: <span style="color:#6ab825;font-weight:bold">false</span>
-</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;terminal&#34;</span>: <span style="color:#e6db74">&#34;console&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;stopOnEntry&#34;</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>        }
 </span></span><span style="display:flex;"><span>    ]
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>There might already exist R debugging configurations, in which case append the above configuration to the existing configurations list. There are two things that we have to look out for, which are the <code>&quot;program&quot;</code> and <code>&quot;R_HOME&quot;</code> fields.</p>
-<p>You can find your <code>R_HOME</code> by executing <code>R.home()</code> in an R console. The R program is usually found as <code>$R_HOME/bin/exec/R</code>, make sure that you have the R <strong>binary</strong> and not the execution script. Doing <code>which R</code> will only give you the execution script and not the binary!</p>
-<h2 id="step-7-debugging-the-c-code">Step 7: Debugging the C++ code</h2>
-<p>Navigate now to the C++ code in <code>src/</code>, you should be able to click left to the line number to set a breakpoint
-<img src="/img/debugging-rcpp-vscode/breakpoint.png" alt="breakpoint" title="Breakpoint"></p>
-<p>Click on the debugger tab to the left, you should now see a green button on the top next to the launch configuration, clicking that will start the debugging session</p>
+</span></span></code></pre></div><p>If you already have R debugging configs, just add this one to the list. Make sure the <code>&quot;program&quot;</code> and <code>&quot;R_HOME&quot;</code> fields match your R installation. Find your <code>R_HOME</code> by running <code>R.home()</code> in R. The R binary is usually at <code>$R_HOME/bin/exec/R</code> (not the script you get from <code>which R</code>).</p>
+<h2 id="step-7-debug-your-c-code">Step 7: Debug Your C++ Code</h2>
+<p>Now, open your C++ file in <code>src/</code> and set a breakpoint by clicking to the left of the line number:</p>
+<p><img src="/img/debugging-rcpp-vscode/breakpoint.png" alt="breakpoint" title="Breakpoint"></p>
+<p>Go to the debugger tab in VSCode and click the green start button next to your launch configuration. This will start the debugging session:</p>
 <p><img src="/img/debugging-rcpp-vscode/debugview.png" alt="debugview" title="Debugging View"></p>
-<p>Once the C++ function has been called, the debugger will break on the breakpoint and it is now possible to inspect variables in the runtime environment</p>
+<p>When your C++ function is called, the debugger will pause at your breakpoint, letting you inspect variables and step through the code:</p>
 <p><img src="/img/debugging-rcpp-vscode/debugsession.png" alt="debugsession" title="Debugging Session"></p>
-<p>The debug console on the bottom panel can also be used, here you can to send commands to LLDB to inspect different variables.</p>
-<h2 id="final-remarks">Final remarks</h2>
-<p>In this tutorial I have demonstrated a working setup for debugging Rcpp using VSCode. One thing that I haven&rsquo;t mentioned is how to add the include paths for all projects in VSCode globally. This dissolves the need of creating the <code>c_cpp_properties.json</code> file everytime in each new project. One can execute <code>Cmd+Shift+P</code> and then type &ldquo;user settings&rdquo;, open that as JSON and paste in the following:</p>
-<div class="highlight"><pre tabindex="0" style="color:#d0d0d0;background-color:#202020;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#a61717;background-color:#e3d2d2">...</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#6ab825;font-weight:bold">&#34;C_Cpp.default.includePath&#34;</span>: [
-</span></span><span style="display:flex;"><span>        <span style="color:#ed9d13">&#34;/opt/homebrew/lib/R/4.3/site-library/Rcpp/include/*&#34;</span>, 
-</span></span><span style="display:flex;"><span>        <span style="color:#ed9d13">&#34;/opt/homebrew/lib/R/include/*&#34;</span>
-</span></span><span style="display:flex;"><span>    ],
-</span></span><span style="display:flex;"><span>    <span style="color:#a61717;background-color:#e3d2d2">...</span>
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>This will add the R/Rcpp include paths to all future projects.</p>
+<p>You can also use the debug console to send commands directly to LLDB.</p>
+<h2 id="final-remarks">Final Remarks</h2>
+<p>That’s it! You now have a working setup for debugging Rcpp code in VSCode. If you want to avoid setting up <code>c_cpp_properties.json</code> for every project, you can add the include paths globally:</p>
+<p>Open user settings as JSON (<code>Cmd+Shift+P</code> → “user settings”), and add:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#e6db74">&#34;C_Cpp.default.includePath&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;/opt/homebrew/lib/R/4.3/site-library/Rcpp/include/*&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;/opt/homebrew/lib/R/include/*&#34;</span>
+</span></span><span style="display:flex;"><span>]
+</span></span></code></pre></div><p>This way, VSCode will always know where to find the R and Rcpp headers for any project.</p>
 
     </div>
 
@@ -460,9 +524,9 @@ usethis::use_test(&#39;my-test&#39;)
     
     <div class="text-neutral-500 mb-4">
         Last modified <span itemprop="dateModified"
-                            datetime="2023-10-06T00:00:00Z"
-                            content="2023-10-06T00:00:00Z">
-        2023.10.06
+                            datetime="2025-07-17T00:00:00Z"
+                            content="2025-07-17T00:00:00Z">
+        2025.07.17
         </span>
     </div>
     
@@ -481,7 +545,7 @@ usethis::use_test(&#39;my-test&#39;)
     </li>
     <li class="ml-2 first:before:content-none before:content-['•']
                 text-neutral-800 dark:text-neutral-400 inline-block list-none">
-      <span class="ml-2">© Jinyang Liu (刘锦阳) 2024</span>
+      <span class="ml-2">© Jinyang Liu (刘锦阳) 2025</span>
     </li>
   </ul>
 </footer>
