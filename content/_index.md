@@ -70,9 +70,11 @@ publications:
 
 -- Born on 14. August 2002 in Shenzhen, China
 
-I am a 3+5 PhD student at the University of Copenhagen. My research interests lie in statistical learning, interpretable machine learning, and super learning. I obtained a Bachelor's degree in Mathematics from UCPH in June 2023, with a specialization in statistics, and a strong focus on measure and probability theory.
+I am currently a 3+5 PhD student in statistics and machine learning at the University of Copenhagen (UCPH). My research focuses on regression, intepretability, and tree-based methods such as gradient boosting and random forests. I hold a Bachelor's degree in Mathematics from UCPH (June 2023), where I specialized in statistics and developed a strong foundation in measure and probability theory.
 
-In addition, I have experience in software engineering and DevOps. I am proficient in Python and have worked with frontend technologies such as React and Vue. I have applied these skills in developing machine learning microservices on the Google Cloud Platform.
+In addition, I am an experienced software engineer and have worked extensively with DevOps. I am proficient in Python and R, which I have used to develop microservices on Google Cloud. 
+
+I am developing a machine learning library for regression in Rust, focusing on creating an interpretable "glass-box" model as an alternative to traditional black-box methods.
 
 ---
 
