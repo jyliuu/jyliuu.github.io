@@ -68,8 +68,6 @@ publications:
 
 # About
 
--- Born on 14. August 2002 in Shenzhen, China
-
 I am currently a 3+5 PhD student in statistics and machine learning at the University of Copenhagen (UCPH). My research focuses on regression, intepretability, and tree-based methods such as gradient boosting and random forests. I hold a Bachelor's degree in Mathematics from UCPH (June 2023), where I specialized in statistics and developed a strong foundation in measure and probability theory.
 
 In addition, I am an experienced software engineer and have worked extensively with DevOps. I am proficient in Python and R, which I have used to develop microservices on Google Cloud. 
