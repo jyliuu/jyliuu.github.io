@@ -262,8 +262,11 @@ const CVContent = ({ isDarkMode }) => (
   <>
     {/* Header Section (CV Specific) */}
     <header className="py-8 border-b border-zinc-200 dark:border-zinc-700">
-      <h1 className="text-4xl sm:text-5xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight leading-tight">
+      <h1 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight leading-tight">
         {personalData.name}
+        <span className="ml-3 text-xl sm:text-2xl font-normal text-zinc-600 dark:text-zinc-400">
+          ({personalData.otherName} · <span className="italic text-base sm:text-lg">lit. embroidered sun</span>)
+        </span>
       </h1>
       <h2 className="mt-2 text-xl font-medium text-blue-700 dark:text-blue-400">
         {personalData.title} | {personalData.institution}
@@ -409,13 +412,23 @@ const BlogPageContent = ({ navigate, blogPosts }) => (
 
 
 // --- Navigation Bar Component ---
+const Logo = ({ navigate }) => (
+  <button
+    onClick={() => navigate({ page: 'CV' })}
+    className="flex items-center space-x-2 hover:opacity-80 transition-opacity group"
+  >
+    <div className="w-8 h-8 rounded-lg bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-normal text-lg shadow-sm group-hover:shadow-md transition-shadow">
+      锦
+    </div>
+    <span className="text-lg font-bold text-zinc-900 dark:text-zinc-50 tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+      {personalData.name}
+    </span>
+  </button>
+);
+
 const NavBar = ({ currentPage, navigate, toggleDarkMode, isDarkMode }) => (
   <nav className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-700 py-4 px-4 sm:px-8 lg:px-12 sticky top-0 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm z-40">
-    <div className="text-lg font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
-      <button onClick={() => navigate({ page: 'CV' })} className="hover:text-blue-600 transition-colors">
-        {personalData.name}
-      </button>
-    </div>
+    <Logo navigate={navigate} />
     <div className="flex items-center space-x-6">
       <NavButton
         page="CV"

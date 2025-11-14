@@ -1,7 +1,8 @@
 import { GraduationCap, BookOpen } from 'lucide-react';
 
 export const personalData = {
-  name: 'Jinyang Liu (刘锦阳)',
+  name: 'Jinyang Liu',
+  otherName: '刘锦阳',
   title: 'PhD Student in Statistics & Machine Learning',
   institution: 'University of Copenhagen',
   email: 'jl (at) math.ku.dk',
