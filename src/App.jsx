@@ -488,7 +488,7 @@ const NavBar = ({ currentPage, navigate, toggleDarkMode, isDarkMode }) => (
 );
 
 const NavButton = ({ page, current, icon: Icon, label, navigate }) => {
-  const baseClasses = "flex items-center text-sm font-medium transition-colors duration-200 p-2 rounded-lg";
+  const baseClasses = "flex items-center justify-center sm:justify-start text-sm font-medium transition-colors duration-200 p-2 rounded-lg";
   const activeClasses = "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-zinc-800 shadow-sm";
   const inactiveClasses = "text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-zinc-50 dark:hover:bg-zinc-800";
 
@@ -497,8 +497,8 @@ const NavButton = ({ page, current, icon: Icon, label, navigate }) => {
       onClick={() => navigate({ page })}
       className={`${baseClasses} ${current ? activeClasses : inactiveClasses}`}
     >
-      <Icon className="w-4 h-4 mr-1 sm:mr-2" />
-      <span className="hidden sm:inline">{label}</span>
+      <Icon className="w-4 h-4 sm:mr-2" />
+      <span className="hidden sm:inline sm:ml-0">{label}</span>
     </button>
   );
 };
