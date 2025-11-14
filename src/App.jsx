@@ -391,24 +391,56 @@ const BlogPost = ({ post, navigate, isDarkMode }) => (
   </div>
 );
 
-const BlogPageContent = ({ navigate, blogPosts }) => (
-  <div className="py-8">
-    <h1 className="text-4xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight leading-tight border-b border-zinc-200 dark:border-zinc-700 pb-4 mb-8">
-      Notes
-    </h1>
-    <div className="space-y-8">
-      {blogPosts && blogPosts.length > 0 ? (
-        blogPosts.map(post => (
-          <PostSummary key={post.id} post={post} navigate={navigate} />
-        ))
-      ) : (
-        <div className="text-center py-20 text-zinc-500 dark:text-zinc-400">
-          Loading posts...
-        </div>
-      )}
+const BlogPageContent = ({ navigate, blogPosts }) => {
+  const [sortOrder, setSortOrder] = useState('newest'); // 'newest' | 'oldest'
+
+  const hasPosts = blogPosts && blogPosts.length > 0;
+
+  const sortedPosts = hasPosts
+    ? [...blogPosts].sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    })
+    : [];
+
+  return (
+    <div className="py-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-zinc-200 dark:border-zinc-700 pb-4 mb-8 gap-4">
+        <h1 className="text-4xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight leading-tight">
+          Notes
+        </h1>
+        {hasPosts && (
+          <div className="flex items-center space-x-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <span className="hidden sm:inline">Sort by</span>
+            <label className="sm:hidden text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-500">
+              Sort
+            </label>
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2 py-1 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+            >
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+            </select>
+          </div>
+        )}
+      </div>
+      <div className="space-y-8">
+        {hasPosts ? (
+          sortedPosts.map((post) => (
+            <PostSummary key={post.id} post={post} navigate={navigate} />
+          ))
+        ) : (
+          <div className="text-center py-20 text-zinc-500 dark:text-zinc-400">
+            Loading posts...
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 
 // --- Navigation Bar Component ---
