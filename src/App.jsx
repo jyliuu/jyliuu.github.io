@@ -218,7 +218,7 @@ const EducationItem = ({ item }) => (
 
 // --- NEW Skills Grid Component ---
 const ResearchSkillsGrid = ({ skills }) => {
-  const researchSkills = skills.find(s => s.category === 'Research Skills')?.items || [];
+  const researchSkills = skills.find(s => s.category === 'Research Interests')?.items || [];
   const toolsAndLibraries = skills.find(s => s.category === 'Tools & Libraries')?.items || [];
 
   const Card = ({ title, items, icon: Icon, borderColor, textColor }) => (
@@ -240,14 +240,14 @@ const ResearchSkillsGrid = ({ skills }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       <Card
-        title="Research Skills"
+        title="Research Interests"
         items={researchSkills}
         icon={BookA}
         borderColor="border-blue-500 dark:border-blue-400"
         textColor="text-blue-700 dark:text-blue-400"
       />
       <Card
-        title="Tools & Libraries"
+        title="Toolbox"
         items={toolsAndLibraries}
         icon={Briefcase}
         borderColor="border-purple-500 dark:border-purple-400"
@@ -313,7 +313,7 @@ const CVContent = ({ isDarkMode }) => (
     </Section>
 
     {/* Technical Skills Section */}
-    <Section title="Technical Skills" icon={Zap}>
+    <Section title="Technical" icon={Zap}>
       <ResearchSkillsGrid skills={skills} />
     </Section>
   </>

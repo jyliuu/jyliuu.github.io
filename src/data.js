@@ -9,7 +9,7 @@ export const personalData = {
   github: 'https://github.com/jyliuu',
   linkedin: 'https://www.linkedin.com/in/jinyang-liu/',
   imageUrl: '/img/main.jpg',
-  about: `I am currently a 3+5 PhD student in Statistics and Machine Learning at the University of Copenhagen (UCPH). My research focuses on regression, interpretability, and tree-based methods such as Gradient Boosting and Random Forests. I am actively developing a machine learning library in Rust, focused on creating an interpretable “glass-box” model as an alternative to traditional black-box methods. I am also an experienced software engineer proficient in Python and R, with experience developing microservices on Google Cloud and utilizing DevOps methodologies.`,
+  about: `I am currently a 3+5 PhD student in Statistics and Machine Learning at the University of Copenhagen (UCPH). My research focuses on regression, interpretability, and tree-based methods such as Gradient Boosting and Random Forests. I am actively developing a machine learning library in Rust, focused on creating an interpretable “glass-box” model as an alternative to traditional black-box methods. I am also an experienced software engineer proficient in Python and R, with experience in DevOps, developing microservices on Google Cloud and utilizing CI/CD pipelines.`,
 };
 
 export const education = [
@@ -47,6 +47,6 @@ export const research = [
 ];
 
 export const skills = [
-  { category: 'Research Skills', items: ['Interpretable ML', 'Gradient Boosting', 'Random Forests', 'Regression Models', 'Statistical Inference'] },
-  { category: 'Tools & Libraries', items: ['Python (Advanced)', 'R (Statistical Analysis)', 'Rust (Systems/ML Library)', 'SQL', 'scikit-learn', 'PyTorch/TensorFlow', 'XGBoost', 'tidyverse', 'Google Cloud Platform (GCP)', 'Microservices', 'Git/GitHub', 'CI/CD'] },
+  { category: 'Research Interests', items: ['Interpretable ML', 'Decision Tree Models', 'Supervised Learning', 'High-Dimensional Statistics', 'Emergent Properties', 'Functional Programming'] },
+  { category: 'Tools & Libraries', items: ['Python (Advanced)', 'R (Statistical Analysis)', 'Rust (Systems/ML Library)', 'TypeScript', 'scikit-learn', 'PyTorch', 'XGBoost', 'tidyverse', 'Google Cloud Platform (GCP)', 'Git/GitHub', 'CI/CD'] },
 ];
