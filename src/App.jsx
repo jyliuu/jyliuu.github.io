@@ -212,7 +212,17 @@ const EducationItem = ({ item }) => (
       <span className="text-sm text-zinc-500 dark:text-zinc-400 flex-shrink-0 ml-4">{item.dates}</span>
     </div>
     <p className="text-sm text-zinc-700 dark:text-zinc-300">{item.institution}</p>
-    <p className="text-sm mt-1 text-zinc-600 dark:text-zinc-400">{item.details}</p>
+    <div className="text-sm mt-1 text-zinc-600 dark:text-zinc-400 prose prose-sm dark:prose-invert max-w-none">
+      <ReactMarkdown
+        components={{
+          a: ({ node, ...props }) => (
+            <a {...props} className="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer" />
+          ),
+        }}
+      >
+        {item.details}
+      </ReactMarkdown>
+    </div>
   </div>
 );
 

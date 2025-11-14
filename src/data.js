@@ -18,14 +18,14 @@ export const education = [
     degree: '3+5 PhD Student in Statistics and Machine Learning',
     institution: 'University of Copenhagen (UCPH)',
     dates: 'Sep 2023 – Aug 2028 (Expected)',
-    details: 'Research focus on interpretable ML, high-dimensional statistics, and tree-based models. Advisor: Munir Hiabu.',
+    details: 'Research focus on interpretable ML, high-dimensional statistics, and tree-based models. Advisor: [Munir Hiabu](https://mhiabu.github.io/).',
   },
   {
     icon: GraduationCap,
     degree: 'BSc in Mathematics (Statistics Specialization)',
     institution: 'University of Copenhagen (UCPH)',
     dates: 'Sep 2020 – June 2023',
-    details: 'Developed a strong foundation in measure theory and probability.',
+    details: 'Took many advanced statistics courses and developed a strong foundation in measure- and probability theory.',
   },
 ];
 
