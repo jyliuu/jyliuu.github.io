@@ -3,40 +3,7 @@ import { Mail, Linkedin, Github, Award, GraduationCap, Zap, BookA, Briefcase } f
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import NavBar from '@/components/NavBar';
-
-function ContactBar() {
-  const emailAddress = personalData.email.replace(' (at) ', '@');
-  
-  return (
-    <div className="flex items-center space-x-4">
-      <a
-        href={`mailto:${emailAddress}`}
-        className="p-2 transition-all duration-300 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700 flex-shrink-0"
-        aria-label="Email"
-      >
-        <Mail className="w-5 h-5 text-zinc-600 dark:text-zinc-400" />
-      </a>
-      <a
-        href={personalData.github}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="GitHub"
-        className="p-2 transition-all duration-300 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700 flex-shrink-0"
-      >
-        <Github className="w-5 h-5 text-zinc-600 dark:text-zinc-400" />
-      </a>
-      <a
-        href={personalData.linkedin}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="LinkedIn"
-        className="p-2 transition-all duration-300 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700 flex-shrink-0"
-      >
-        <Linkedin className="w-5 h-5 text-zinc-600 dark:text-zinc-400" />
-      </a>
-    </div>
-  );
-}
+import ContactBar from '@/components/ContactBar';
 
 function Section({ title, icon: Icon, children, noBorder = false }: { title: string; icon: any; children: React.ReactNode; noBorder?: boolean }) {
   return (
