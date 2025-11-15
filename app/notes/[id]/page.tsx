@@ -14,8 +14,9 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const post = getPostData(params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const post = getPostData(id);
 
   return {
     title: `${post.title} | ${personalData.name}`,
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     openGraph: {
       title: `${post.title} | ${personalData.name}`,
       description: post.summary,
-      url: `https://jyliuu.github.io/notes/${params.id}`,
+      url: `https://jyliuu.github.io/notes/${id}`,
       type: 'article',
       authors: [personalData.name],
       publishedTime: new Date(post.date).toISOString(),
@@ -46,10 +47,11 @@ function parseDate(dateStr: string): string {
   }
 }
 
-export default function PostPage({ params }: { params: { id: string } }) {
+export default async function PostPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   let post;
   try {
-    post = getPostData(params.id);
+    post = getPostData(id);
   } catch (error) {
     notFound();
   }
