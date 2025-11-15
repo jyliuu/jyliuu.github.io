@@ -646,9 +646,10 @@ const App = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-900 font-sans transition-colors duration-500">
       <style>{`
-        /* Set Inter as primary font */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        .font-sans { font-family: 'Inter', sans-serif; }
+        /* Set Source Sans Pro as primary font */
+        @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap');
+        .font-sans { font-family: 'Source Sans Pro', sans-serif; }
+        
         /* Reset and enforce professional code aesthetic */
         pre {
           font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
