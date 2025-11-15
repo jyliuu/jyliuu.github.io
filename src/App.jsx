@@ -363,43 +363,97 @@ const PostSummary = ({ post, navigate }) => (
   </article>
 );
 
-const BlogPost = ({ post, navigate, isDarkMode }) => (
-  <div className="py-8">
-    <button
-      onClick={() => navigate({ page: 'BLOG' })}
-      className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors mb-6 font-medium"
-    >
-      <ArrowLeft className="w-5 h-5 mr-2" /> Back to all posts
-    </button>
+const BlogPost = ({ post, navigate, isDarkMode }) => {
+  // Parse date for structured data
+  const parseDate = (dateStr) => {
+    try {
+      const date = new Date(dateStr);
+      return date.toISOString();
+    } catch {
+      return new Date().toISOString();
+    }
+  };
 
-    <header className="border-b border-zinc-200 dark:border-zinc-700 pb-4 mb-8">
-      <h1 className="text-4xl font-extrabold text-zinc-900 dark:text-zinc-100 leading-tight">
-        {post.title}
-      </h1>
-      <div className="flex items-center text-md text-zinc-500 dark:text-zinc-400 mt-2">
-        <Calendar className="w-4 h-4 mr-2" />
-        <span>Published on {post.date}</span>
-        <span className="mx-3">•</span>
-        <div className="flex space-x-2">
-          {post.tags.map(tag => (
-            <span key={tag} className="text-sm font-medium px-3 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
-              {tag}
-            </span>
-          ))}
+  // Add structured data (JSON-LD) for SEO
+  useEffect(() => {
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": post.title,
+      "description": post.summary || post.title,
+      "author": {
+        "@type": "Person",
+        "name": personalData.name,
+        "url": "https://jyliuu.github.io/"
+      },
+      "datePublished": parseDate(post.date),
+      "url": `https://jyliuu.github.io/#post/${post.id}`,
+      "keywords": post.tags?.join(', ') || '',
+    };
+
+    // Remove existing structured data script if any
+    const existingScript = document.getElementById('blog-post-structured-data');
+    if (existingScript) {
+      existingScript.remove();
+    }
+
+    // Add new structured data
+    const script = document.createElement('script');
+    script.id = 'blog-post-structured-data';
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify(structuredData);
+    document.head.appendChild(script);
+
+    return () => {
+      const scriptToRemove = document.getElementById('blog-post-structured-data');
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
+    };
+  }, [post]);
+
+  return (
+    <article className="py-8" itemScope itemType="https://schema.org/BlogPosting">
+      <button
+        onClick={() => navigate({ page: 'BLOG' })}
+        className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors mb-6 font-medium"
+      >
+        <ArrowLeft className="w-5 h-5 mr-2" /> Back to all posts
+      </button>
+
+      <header className="border-b border-zinc-200 dark:border-zinc-700 pb-4 mb-8">
+        <h1 className="text-4xl font-extrabold text-zinc-900 dark:text-zinc-100 leading-tight" itemProp="headline">
+          {post.title}
+        </h1>
+        <div className="flex items-center text-md text-zinc-500 dark:text-zinc-400 mt-2">
+          <Calendar className="w-4 h-4 mr-2" />
+          <time dateTime={parseDate(post.date)} itemProp="datePublished">
+            Published on {post.date}
+          </time>
+          <span className="mx-3">•</span>
+          <div className="flex space-x-2" itemProp="keywords">
+            {post.tags.map(tag => (
+              <span key={tag} className="text-sm font-medium px-3 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
+      </header>
+
+      <div itemProp="articleBody">
+        <MarkdownContent content={post.content} isDarkMode={isDarkMode} />
       </div>
-    </header>
 
-    <MarkdownContent content={post.content} isDarkMode={isDarkMode} />
-
-    <button
-      onClick={() => navigate({ page: 'BLOG' })}
-      className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors mt-12 font-medium border-t border-zinc-200 dark:border-zinc-700 pt-4"
-    >
-      <ArrowLeft className="w-5 h-5 mr-2" /> Return to Blog
-    </button>
-  </div>
-);
+      <button
+        onClick={() => navigate({ page: 'BLOG' })}
+        className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors mt-12 font-medium border-t border-zinc-200 dark:border-zinc-700 pt-4"
+      >
+        <ArrowLeft className="w-5 h-5 mr-2" /> Return to Blog
+      </button>
+    </article>
+  );
+};
 
 const BlogPageContent = ({ navigate, blogPosts }) => {
   const [sortOrder, setSortOrder] = useState('newest'); // 'newest' | 'oldest'
@@ -598,6 +652,86 @@ const App = () => {
       });
     }
   }, [currentPage]);
+
+  // Update meta tags dynamically for SEO
+  useEffect(() => {
+    const updateMetaTag = (property, content) => {
+      let element = document.querySelector(`meta[property="${property}"]`) ||
+        document.querySelector(`meta[name="${property}"]`);
+      if (!element) {
+        element = document.createElement('meta');
+        if (property.startsWith('og:')) {
+          element.setAttribute('property', property);
+        } else {
+          element.setAttribute('name', property);
+        }
+        document.head.appendChild(element);
+      }
+      element.setAttribute('content', content);
+    };
+
+    const updateTitle = (title) => {
+      document.title = title;
+    };
+
+    const updateCanonical = (url) => {
+      let link = document.querySelector('link[rel="canonical"]');
+      if (!link) {
+        link = document.createElement('link');
+        link.setAttribute('rel', 'canonical');
+        document.head.appendChild(link);
+      }
+      link.setAttribute('href', url);
+    };
+
+    if (currentPage.page === 'POST' && currentPage.postId) {
+      const post = blogPosts.find(p => p.id === currentPage.postId);
+      if (post) {
+        const fullTitle = `${post.title} | ${personalData.name}`;
+        const description = post.summary || `Research notes by ${personalData.name}`;
+        const url = `https://jyliuu.github.io/#post/${post.id}`;
+
+        updateTitle(fullTitle);
+        updateMetaTag('description', description);
+        updateMetaTag('og:title', fullTitle);
+        updateMetaTag('og:description', description);
+        updateMetaTag('og:url', url);
+        updateMetaTag('og:type', 'article');
+        updateMetaTag('twitter:title', fullTitle);
+        updateMetaTag('twitter:description', description);
+        updateCanonical(url);
+      }
+    } else if (currentPage.page === 'BLOG') {
+      const title = `Notes | ${personalData.name}`;
+      const description = `Research notes and blog posts by ${personalData.name}`;
+      const url = 'https://jyliuu.github.io/#notes';
+
+      updateTitle(title);
+      updateMetaTag('description', description);
+      updateMetaTag('og:title', title);
+      updateMetaTag('og:description', description);
+      updateMetaTag('og:url', url);
+      updateMetaTag('og:type', 'website');
+      updateMetaTag('twitter:title', title);
+      updateMetaTag('twitter:description', description);
+      updateCanonical(url);
+    } else {
+      // CV/Home page
+      const title = `${personalData.name} | Statistics & Machine Learning`;
+      const description = `Personal site and notes of ${personalData.name}, ${personalData.title} at ${personalData.institution}.`;
+      const url = 'https://jyliuu.github.io/';
+
+      updateTitle(title);
+      updateMetaTag('description', description);
+      updateMetaTag('og:title', title);
+      updateMetaTag('og:description', description);
+      updateMetaTag('og:url', url);
+      updateMetaTag('og:type', 'website');
+      updateMetaTag('twitter:title', title);
+      updateMetaTag('twitter:description', description);
+      updateCanonical(url);
+    }
+  }, [currentPage, blogPosts]);
 
   // Theme logic
   useEffect(() => {
