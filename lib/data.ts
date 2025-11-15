@@ -9,7 +9,7 @@ export const personalData = {
   github: 'https://github.com/jyliuu',
   linkedin: 'https://www.linkedin.com/in/jinyang-liu/',
   imageUrl: '/img/main.jpg',
-  about: `I am currently a 3+5 PhD student in Statistics and Machine Learning at the University of Copenhagen (UCPH). My research focuses on regression, interpretability, and tree-based methods such as Gradient Boosting and Random Forests. I am actively developing a machine learning library in Rust, focused on creating an interpretable “glass-box” model as an alternative to traditional black-box methods. I am also an experienced software engineer proficient in Python and R, with experience in DevOps, developing microservices on Google Cloud and utilizing CI/CD pipelines.`,
+  about: `I am currently a 3+5 PhD student in Statistics and Machine Learning at the University of Copenhagen (UCPH). My research focuses on regression, interpretability, and tree-based methods such as Gradient Boosting and Random Forests. I am actively developing a machine learning library in Rust, focused on creating an interpretable "glass-box" model as an alternative to traditional black-box methods. I am also an experienced software engineer proficient in Python and R, with experience in DevOps, developing microservices on Google Cloud and utilizing CI/CD pipelines.`,
 };
 
 export const education = [
