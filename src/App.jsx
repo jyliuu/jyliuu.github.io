@@ -588,6 +588,16 @@ const App = () => {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [handleHashChange]);
 
+  // Track page views in Google Analytics for hash-based routing
+  useEffect(() => {
+    // Only track if gtag is available (after script loads)
+    if (typeof window.gtag === 'function') {
+      const pagePath = window.location.pathname + window.location.hash;
+      window.gtag('event', 'page_view', {
+        page_path: pagePath,
+      });
+    }
+  }, [currentPage]);
 
   // Theme logic
   useEffect(() => {
